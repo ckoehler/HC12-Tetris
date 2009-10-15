@@ -1,64 +1,67 @@
 * =============
 * = Registers =
 * =============
-SPCR	equ	$1028	*SPI Control
-SPSR	equ	$1029	*SPI Status
-SPDR	equ	$102A	*SPI Data
-DDRD	equ	$1009	*Register D
-PORTD	equ	$1008
-SCCR2	equ	$102D
-SCSR	equ	$102E
-SCDR	equ	$102F
-BAUD	equ	$102B
+SP0CR1	equ	$08D0	*SPI Control
+SP0SR	equ	$08D3	*SPI Status
+SP0DR	equ	$08D5	*SPI Data
+SP0BR	equ	$08D2	*BAUD register
+DDRS	equ	$08D7
+PORTS	equ	$08D6
+
+SC0SR1	equ	$08C4
+SC0DRL	equ	$08C7
 
 * =============
 * = Variables =
 * =============
+
+	org	$00
 * define memory range to store the stage in.
 * stage = all unmovable pixels
-stage_beg	equ	$0000
-stage_end	equ	$000F
+stage_beg	rmb	15
+stage_end	rmb	1
 
-block_top_ptr	equ	$0010
-block_bot_ptr	equ	$0011
+block_top_ptr	rmb	1
+block_bot_ptr	rmb	1
 
-* L D R U Start _ _ Select
-buttons1	equ	$0012
-* Square X O Triangle R1 L1 R2 L2
-buttons2	equ	$0013
+* Select _ _ Start U R D L
+buttons1	rmb	1
+* L2 R2 L1 R1 Triangle O X Square
+buttons2	rmb	1
+
+* saves last button configs
+buttons1l	rmb	1
+buttons2l	rmb	1
 
 * points somewhere in the stage to the bottom
 * of the current block
-block_ptr	equ	$0012
+block_ptr	rmb	1
+
+
+temp	rmb	1
 
 	org	$2000
 * ========
 * = Init =
 * ========
 Init:	jsr	SPI_INIT
-*	jsr	SCI_INIT
+	ldaa	#0
+	staa	buttons1l
+	staa	buttons2l
 	jsr	Main
 
 *Init SPI
 SPI_INIT:
-	ldab	DDRD	*Load Current state of DDRD
-	orab	#$38	*Turn on Slave select
-	stab	DDRD	*store
-	ldab	#%01011110	*Enable SPI
-	stab	SPCR
-	ldab	PORTD
-	orab	#$20
-	stab	PORTD
-	rts
-
-*Init SCI
-SCI_INIT:
-	psha
-	ldaa	#$08	* enable Tx and Rx
-	staa	SCCR2
-	ldaa	#$30	* set BAUD to 9600
-	staa	BAUD
-	pula
+	ldab	DDRS	*Load Current state of DDRS
+	orab	#%11100000	*Define output ports for Port S
+	stab	DDRS	*store
+	ldab	#%01011101	*Enable SPI
+	stab	SP0CR1
+	ldab	#%00000100	* set rate to 250kHz
+	stab	SP0BR
+	ldab	PORTS	
+	orab	#$80
+	stab	PORTS
 	rts
 
 * ========
@@ -88,7 +91,7 @@ Main2:
 * saves buttons in buttons1 and buttons2
 get_buttons:
 	jsr	Pad_En
-	ldab	#$80	* send Hello to pad
+	ldab	#$01	* send Hello to pad
 	jsr	Pad_RW
 	ldab	#$42	* now send request for data
 	jsr	Pad_RW	* after this we get Pad ID
@@ -97,10 +100,16 @@ get_buttons:
 	ldab	#$00
 	jsr	Pad_RW
 	comb
+*	stab	temp
+*	eorb	buttons1l
+*	andb	temp
 	stab	buttons1
 	ldab	#$00
 	jsr	Pad_RW
 	comb
+*	stab	temp
+*	eorb	buttons2l
+*	andb	temp
 	stab	buttons2
 	jsr	Pad_En
 	rts
@@ -108,9 +117,9 @@ get_buttons:
 *Toggles Pad SS
 Pad_En:
 	pshb
-	ldab	PORTD	*Load Current State of DDRD
-	eorb	#$20	*Toggle Slave Select
-	stab	PORTD	*Store back
+	ldab	PORTS	*Load Current State of PORTS
+	eorb	#$80	*Toggle Slave Select
+	stab	PORTS	*Store back
 	pulb
 	rts
 
@@ -118,13 +127,13 @@ Pad_En:
 * Out: {B} with what's returned
 Pad_RW:		
 	psha
-	stab	SPDR	*Store {B} to send to pad
+	stab	SP0DR	*Store {B} to send to pad
 
 Pad_RW1:
-	ldab	SPSR	*Reads Pad Status Register
+	ldab	SP0SR	*Reads Pad Status Register
 	andb	#$80	*Checks for status high on bit 7
 	beq	Pad_RW1	*Checks again if not high
-	ldab	SPDR	*Pulls data from Pad
+	ldab	SP0DR	*Pulls data from Pad
 Pad_RW_E:	pula
 	rts
 	
@@ -155,11 +164,11 @@ OutputEnd:	pula
 * expects data to send out in A
 Output_Char:     
 	pshb
-Output_Char1:	ldab	SCSR	* check to see if the transmit register is empty
+Output_Char1:	ldab	SC0SR1	* check to see if the transmit register is empty
 	andb	#$80
 	cmpb	#$80
 	bne	Output_Char1	* if not, keep looping until it is
-	staa	SCDR	* finally, write the character to the SCI
+	staa	SC0DRL	* finally, write the character to the SCI
 	pulb
 	rts
 
