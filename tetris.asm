@@ -24,6 +24,9 @@ stage_end	rmb	1
 block_top_ptr	rmb	1
 block_bot_ptr	rmb	1
 
+* it's the block height, namely block_top_ptr - block_bot_ptr
+block_height	rmb	1
+
 * Select _ _ Start U R D L
 buttons1	rmb	1
 * L2 R2 L1 R1 Triangle O X Square
@@ -37,6 +40,8 @@ buttons2l	rmb	1
 * of the current block
 block_ptr	rmb	1
 
+* FF if vertical collision detected
+collision	rmb	1
 
 temp	rmb	1
 
@@ -82,6 +87,18 @@ Main1:
 	beq	Main2
 	jsr	move_right
 Main2:
+* check for rotate left (X)
+	ldaa	buttons2
+	anda	#$2
+	beq	Main3
+	jsr	rotate_left
+Main3:
+* check for rotate right (O)
+	ldaa	buttons2
+	anda	#$4
+	beq	Main4
+	jsr	rotate_right
+Main4:
 	bra	Main
 
 * ========
@@ -100,20 +117,24 @@ get_buttons:
 	ldab	#$00
 	jsr	Pad_RW
 	comb
-*	stab	temp
-*	eorb	buttons1l
-*	andb	temp
+	stab	temp
+	eorb	buttons1l
+	andb	temp
 	stab	buttons1
 	ldab	#$00
 	jsr	Pad_RW
 	comb
-*	stab	temp
-*	eorb	buttons2l
-*	andb	temp
+	stab	temp
+	eorb	buttons2l
+	andb	temp
 	stab	buttons2
 	jsr	Pad_En
 	rts
-	
+
+
+* =======================
+* = SPI utility methods =
+* =======================
 *Toggles Pad SS
 Pad_En:
 	pshb
@@ -136,19 +157,10 @@ Pad_RW1:
 	ldab	SP0DR	*Pulls data from Pad
 Pad_RW_E:	pula
 	rts
-	
 
-move_left:
-	ldx	#STR_moveleft
-	jsr	Output
-	rts
-
-move_right:
-	ldx	#STR_moveright
-	jsr	Output
-	rts
-	
-
+* =======================
+* = SCI utility methods =
+* =======================	
 * work on the byte that X points to that we get
 Output:
 	psha
@@ -171,11 +183,101 @@ Output_Char1:	ldab	SC0SR1	* check to see if the transmit register is empty
 	staa	SC0DRL	* finally, write the character to the SCI
 	pulb
 	rts
+	
+* ==================
+* = Button actions =
+* ==================	
+move_left:
+	ldx	#STR_moveleft
+	jsr	Output
+	rts
 
+move_right:
+	ldx	#STR_moveright
+	jsr	Output
+	rts
+
+rotate_left:
+	ldx	#STR_rotateleft
+	jsr	Output
+	rts
+	
+rotate_right:
+	ldx	#STR_rotateright
+	jsr	Output
+	rts	
+	
+* ===================
+* = Game Logic subs =
+* ===================
+
+* check for horizontal collision
+check_hcol_l:
+	ldab	block_height
+check_hcol_l1:
+* first make sure if any line of the block
+* already occupies bit 7
+	ldaa	block_top_ptr
+	anda	#$80
+	beq	check_hcol_l1
+	jsr	set_collision
+check_hcol_end:
+	rts
+
+
+
+* checks for vertical collisions 
+check_vcol:
+	psha
+	pshb
+	ldab	block_height
+* x will keep track of the stage line
+	ldx	#block_ptr
+* y will keep track of the block line
+	ldy	#block_ptr
+check_vcol1:
+* look ahead one row
+	ldaa	1,x
+* and it with the current line of the block
+	anda	0,y
+* if we don't get 0, we have a collision
+	jsr	set_collision
+* see if we checked all lines of the block
+	cmpb	#0
+* if so, finish
+	beq	check_vcol_end
+* else decrement b...
+	decb
+* ... and check the next line of the stage against the 
+* next line of the block -> increment both x and y
+	inx
+	iny
+	
+	bra	check_vcol1
+check_vcol_end:	
+	pulb
+	pula
+	rts	
+
+
+set_collision:
+	ldaa	#$FF
+	staa	collision	
+	jsr
+
+* ====================
+* = Constant strings =
+* ====================
 STR_moveleft:	fcc	"Left pushed!"
 	fcb	10,13,0
 
 STR_moveright:	fcc	"Right pushed!"
+	fcb	10,13,0
+
+STR_rotateright:	fcc	"rotate right!"
+	fcb	10,13,0
+		
+STR_rotateleft:	fcc	"rotate left!"
 	fcb	10,13,0
 * ===========
 * = Vectors =
