@@ -50,6 +50,7 @@ temp	rmb	1
 * = Init =
 * ========
 Init:	jsr	SPI_INIT
+	jsr	Var_Init
 	ldaa	#0
 	staa	buttons1l
 	staa	buttons2l
@@ -67,6 +68,10 @@ SPI_INIT:
 	ldab	PORTS	
 	orab	#$80
 	stab	PORTS
+	rts
+
+Var_Init:	ldaa	#4
+	staa	block_height
 	rts
 
 * ========
@@ -186,10 +191,35 @@ Output_Char1:	ldab	SC0SR1	* check to see if the transmit register is empty
 	
 * ==================
 * = Button actions =
-* ==================	
+* ==================
+
+* make two passes: first, just check for $80. If we find it
+* we can't shift anything left. Otherwise, we do the actual
+* shifting
 move_left:
-	ldx	#STR_moveleft
-	jsr	Output
+	ldx	#block_ptr
+	ldab	block_height
+move_left_1:
+	ldaa	0,x
+	inx
+	decb
+	anda	#$80
+	beq	move_left_end
+	cmpb	#0
+	beq	move_left_2
+	bra	move_left_1
+
+move_left_2:	ldx	#block_ptr
+	ldab	#4
+move_left_3:
+	ldaa	0,x
+	inx
+	decb
+	lsla
+	cmpb	#0
+	beq	move_left_end
+	bra	move_left_3
+move_left_end:
 	rts
 
 move_right:
