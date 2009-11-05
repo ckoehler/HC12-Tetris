@@ -210,7 +210,7 @@ move_left_1:
 	bra	move_left_1
 
 move_left_2:	ldx	#block_ptr
-	ldab	#4
+	ldab	block_height
 move_left_3:
 	ldaa	0,x
 	inx
@@ -222,9 +222,33 @@ move_left_3:
 move_left_end:
 	rts
 
+* make two passes: first, just check for $01. If we find it
+* we can't shift anything right. Otherwise, we do the actual
+* shifting
 move_right:
-	ldx	#STR_moveright
-	jsr	Output
+	ldx	#block_ptr
+	ldab	block_height
+move_right_1:
+	ldaa	0,x
+	inx
+	decb
+	anda	#$01
+	beq	move_right_end
+	cmpb	#0
+	beq	move_right_2
+	bra	move_right_1
+
+move_right_2:	ldx	#block_ptr
+	ldab	block_height
+move_right_3:
+	ldaa	0,x
+	inx
+	decb
+	lsra
+	cmpb	#0
+	beq	move_right_end
+	bra	move_right_3
+move_right_end:
 	rts
 
 rotate_left:
