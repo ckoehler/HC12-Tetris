@@ -36,7 +36,7 @@ buttons2	rmb	1
 buttons1l	rmb	1
 buttons2l	rmb	1
 
-* points somewhere in the stage to the top
+* points somewhere in the stage to the bottom
 * of the current block
 block_ptr	rmb	1
 
@@ -45,7 +45,7 @@ collision	rmb	1
 
 temp	rmb	1
 
-	org	$2000
+	org	$1000
 * ========
 * = Init =
 * ========
@@ -61,9 +61,9 @@ SPI_INIT:
 	ldab	DDRS	*Load Current state of DDRS
 	orab	#%11100000	*Define output ports for Port S
 	stab	DDRS	*store
-	ldab	#%01011101	*Enable SPI
+	ldab	#%01011100	*Enable SPI
 	stab	SP0CR1
-	ldab	#%00000100	* set rate to 250kHz
+	ldab	#%00000101	* set rate to 125kHz
 	stab	SP0BR
 	ldab	PORTS	
 	orab	#$80
@@ -113,7 +113,7 @@ Main4:
 * saves buttons in buttons1 and buttons2
 get_buttons:
 	jsr	Pad_En
-	ldab	#$01	* send Hello to pad
+	ldab	#$80	* send Hello to pad
 	jsr	Pad_RW
 	ldab	#$42	* now send request for data
 	jsr	Pad_RW	* after this we get Pad ID
