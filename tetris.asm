@@ -37,8 +37,7 @@ buttons2	rmb	1
 buttons1l	rmb	1
 buttons2l	rmb	1
 
-* points somewhere in the stage to the bottom
-* of the current block
+* offset from top of the stage, downwards
 stage_block_ptr	rmb	1
 
 * FF if vertical collision detected
