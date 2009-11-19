@@ -345,7 +345,7 @@ set_collision:
 InitCurPointers:	pshd
 	ldd	CursorInit
 	std	CPointer
-	std	CSPointer
+	std	CCPointer
 	puld
 	rts
 
