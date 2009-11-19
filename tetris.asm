@@ -197,7 +197,7 @@ Output_Char1:	ldab	SC0SR1	* check to see if the transmit register is empty
 * we can't shift anything left. Otherwise, we do the actual
 * shifting
 move_left:
-	ldx	#stage_block_ptr
+	ldx	#block_ptr
 	ldab	block_height
 move_left_1:
 	ldaa	0,x
@@ -209,7 +209,7 @@ move_left_1:
 	beq	move_left_2
 	bra	move_left_1
 
-move_left_2:	ldx	#stage_block_ptr
+move_left_2:	ldx	#block_ptr
 	ldab	block_height
 move_left_3:
 	ldaa	0,x
@@ -226,7 +226,7 @@ move_left_end:
 * we can't shift anything right. Otherwise, we do the actual
 * shifting
 move_right:
-	ldx	#stage_block_ptr
+	ldx	#block_ptr
 	ldab	block_height
 move_right_1:
 	ldaa	0,x
@@ -238,7 +238,7 @@ move_right_1:
 	beq	move_right_2
 	bra	move_right_1
 
-move_right_2:	ldx	#stage_block_ptr
+move_right_2:	ldx	#block_ptr
 	ldab	block_height
 move_right_3:
 	ldaa	0,x
