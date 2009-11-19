@@ -9,28 +9,115 @@ BIT_2	equ	4	;/WRITE
 BIT_3	equ	8	;/CS
 BIT_4	equ	16	;A0
 
+
+CPointer	rmb	2
+CCPointer	rmb	2
+CursorInit	equ	#$0000
+
+
+Mwrite	equ	$42
+
 	org	$1000
 	
 	jsr	LCD_INIT
-	jsr	Square
 	swi
-	
-Square:	psha
+
+;Init Cursor Pointers to starting position (void)	
+InitCurPointers:	pshd
+	ldd	CursorInit
+	std	CPointer
+	std	CSPointer
+	puld
+	rts
+
+;Draws Shape based on values in memory (void)	
+DrawShape:	pshd
 	pshx
+	pshy
+	jsr	ClearShape
+	ldd	CursorInit
+	addd	stage_block_ptr
+	std	CCPointer
+	std	CPointer
+	
+	ldx	block_ptr	;*************************************CheckLocation
+	
+	ldaa	#Mwrite	;init memory write
+	jsr	LCD_Command
+
+DrawShape1:	ldaa	1,x-
+	ldd	CPointer
+	xgdx
+	dex
+	xgdx
+	jsr	UpdateCursor
+	ldy	#8
+DrawShape2:	lsla	
+	bcs	Square
+	dey
+	bne	DrawShape2	
+	
+	cmpx	#SomeValue	;************************************Check
+	bne	DrawShape1	
+	puly
+	pulx
+	puld
+	rts
+	
+;Clears old shape based on CSPointer which has old cursor position (void)	
+ClearShape:	pshd
+	pshx
+	pshy
+	ldd	CCPointer
+	jsr	UpdateCursor	;Set Cursor to start of shape
+	ldy	#4	
+	ldaa	#Mwrite
+	jsr	LCD_Command
+	ldaa	#$00
+ClearShape1:	ldx	#78
+ClearShape2:	jsr	LCD_Data
+	dex
+	bne	ClearShape2
+	dey	
+	bne	ClearShape3
+	bra	ClearShape_RTS
+ClearShape3:	ldd	CCPointer
+	xgdx
+	dex	
+	xgdx
+	std	CCPointer
+	jsr	UpdateCursor
+	bra	ClearShape1
+ClearShape_RTS:	puly
+	pulx
+	puld
+	rts
+
+;Requires D have cursor position (D)	
+UpdateCursor:	pshd
 	ldaa	#$46
 	jsr	LCD_Command
-	ldaa	#$00
+	puld
 	jsr	LCD_Data
-	ldaa	#$00
+	tba
 	jsr	LCD_Data
+	rts
+
+;Draws single square within shape (void)	
+Square:	psha
+	pshx
+	ldd	CPointer
+	jsr	UpdateCursor
 	
-	ldaa	#$42
-	jsr	LCD_Command
+
 	ldx	#8
 Square1:	ldaa	#$FF
 	jsr	LCD_Data
 	dex
 	bne	Square1
+	ldaa	#$00
+	jsr	LCD_Data
+	jsr	LCD_Data
 	pulx
 	pula
 	rts
