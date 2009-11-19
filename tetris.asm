@@ -21,10 +21,11 @@ SC0DRL	equ	$08C7
 stage_beg	rmb	15
 stage_end	rmb	1
 
-block_top_ptr	rmb	1
-block_bot_ptr	rmb	1
+* points to the bottom memory location that defines
+* the block shape
+block_ptr	rmb	1
 
-* it's the block height, namely block_top_ptr - block_bot_ptr
+* it's the block height
 block_height	rmb	1
 
 * Select _ _ Start U R D L
@@ -38,7 +39,7 @@ buttons2l	rmb	1
 
 * points somewhere in the stage to the bottom
 * of the current block
-block_ptr	rmb	1
+stage_block_ptr	rmb	1
 
 * FF if vertical collision detected
 collision	rmb	1
@@ -197,7 +198,7 @@ Output_Char1:	ldab	SC0SR1	* check to see if the transmit register is empty
 * we can't shift anything left. Otherwise, we do the actual
 * shifting
 move_left:
-	ldx	#block_ptr
+	ldx	#stage_block_ptr
 	ldab	block_height
 move_left_1:
 	ldaa	0,x
@@ -209,7 +210,7 @@ move_left_1:
 	beq	move_left_2
 	bra	move_left_1
 
-move_left_2:	ldx	#block_ptr
+move_left_2:	ldx	#stage_block_ptr
 	ldab	block_height
 move_left_3:
 	ldaa	0,x
@@ -226,7 +227,7 @@ move_left_end:
 * we can't shift anything right. Otherwise, we do the actual
 * shifting
 move_right:
-	ldx	#block_ptr
+	ldx	#stage_block_ptr
 	ldab	block_height
 move_right_1:
 	ldaa	0,x
@@ -238,7 +239,7 @@ move_right_1:
 	beq	move_right_2
 	bra	move_right_1
 
-move_right_2:	ldx	#block_ptr
+move_right_2:	ldx	#stage_block_ptr
 	ldab	block_height
 move_right_3:
 	ldaa	0,x
@@ -271,7 +272,7 @@ check_hcol_l:
 check_hcol_l1:
 * first make sure if any line of the block
 * already occupies bit 7
-	ldaa	block_top_ptr
+	ldaa	block_ptr
 	anda	#$80
 	beq	check_hcol_l1
 	jsr	set_collision
@@ -286,9 +287,9 @@ check_vcol:
 	pshb
 	ldab	block_height
 * x will keep track of the stage line
-	ldx	#block_ptr
+	ldx	#stage_block_ptr
 * y will keep track of the block line
-	ldy	#block_ptr
+	ldy	#stage_block_ptr
 check_vcol1:
 * look ahead one row
 	ldaa	1,x
