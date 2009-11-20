@@ -22,16 +22,16 @@ BIT_2	equ	4	;/WRITE
 BIT_3	equ	8	;/CS
 BIT_4	equ	16	;A0
 
-CursorInit	equ	#$0000
+CursorInit	equ	#$0000	;Initial Condition for LCD stage
 
-Mwrite	equ	$42
+Mwrite	equ	$42	;Memory write command for LCD
 
 * =============
 * = Variables =
 * =============
 
 	org	$00
-	
+* cursor pointers used to define location on screen	
 CPointer	rmb	2
 CCPointer	rmb	2
 * define memory range to store the stage in.
@@ -359,31 +359,34 @@ DrawShape:	pshd
 	std	CCPointer
 	std	CPointer
 	
-	ldx	block_ptr	;*************************************CheckLocation
+	ldx	block_ptr
 	
 	ldaa	#Mwrite	;init memory write
 	jsr	LCD_Command
 
-DrawShape1:	ldaa	1,x-
-	ldd	CPointer
-	xgdx
-	dex
-	xgdx
+DrawShape1:	ldd	CPointer
 	jsr	UpdateCursor
+	ldaa	1,x-
 	ldy	#8
 DrawShape2:	lsla	
 	bcs	Square
 	dey
 	bne	DrawShape2	
-	
-	cmpx	#SomeValue	;************************************Check
+	ldd	CPointer
+	xgdx
+	dex
+	xgdx
+	std	CPointer
+	TFR	x,d
+	addd	#4
+	cmpd	block_ptr
 	bne	DrawShape1	
 	puly
 	pulx
 	puld
 	rts
 	
-;Clears old shape based on CSPointer which has old cursor position (void)	
+;Clears old shape based on CCPointer which has old cursor position (void)	
 ClearShape:	pshd
 	pshx
 	pshy
@@ -392,21 +395,22 @@ ClearShape:	pshd
 	ldy	#4	
 	ldaa	#Mwrite
 	jsr	LCD_Command
-	ldaa	#$00
-ClearShape1:	ldx	#78
+ClearShape1:	ldaa	#$00
+	ldx	#78
 ClearShape2:	jsr	LCD_Data
 	dex
 	bne	ClearShape2
 	dey	
-	bne	ClearShape3
-	bra	ClearShape_RTS
-ClearShape3:	ldd	CCPointer
+	
+	ldd	CCPointer
 	xgdx
 	dex	
 	xgdx
 	std	CCPointer
 	jsr	UpdateCursor
-	bra	ClearShape1
+	
+	bne	ClearShape1
+	bra	ClearShape_RTS
 ClearShape_RTS:	puly
 	pulx
 	puld
@@ -425,10 +429,6 @@ UpdateCursor:	pshd
 ;Draws single square within shape (void)	
 Square:	psha
 	pshx
-	ldd	CPointer
-	jsr	UpdateCursor
-	
-
 	ldx	#8
 Square1:	ldaa	#$FF
 	jsr	LCD_Data
