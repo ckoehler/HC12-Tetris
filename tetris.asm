@@ -73,6 +73,7 @@ Init:	jsr	SPI_INIT
 	staa	buttons1l
 	staa	buttons2l
 	jsr	LCD_INIT
+	jsr	InitCurPointers
 	jsr	Main
 
 *Init SPI
