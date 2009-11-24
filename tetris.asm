@@ -67,13 +67,25 @@ temp	rmb	1
 * ========
 * = Init =
 * ========
-Init:	jsr	SPI_INIT
+Init:	
+	jsr	SPI_INIT
 	jsr	Var_Init
 	ldaa	#0
 	staa	buttons1l
 	staa	buttons2l
+;LCD Init	
 	jsr	LCD_INIT
 	jsr	InitCurPointers
+	
+;************TESTING ONLY**********************	
+;	ldd	#$0000
+;	jsr	UpdateCursor
+;	ldaa	#Mwrite
+;	jsr	LCD_Command
+;	jsr	Square
+;***********TESTING ONLY***********************
+
+;Jump to Main
 	jsr	Main
 
 *Init SPI
@@ -354,16 +366,16 @@ InitCurPointers:	pshd
 DrawShape:	pshd
 	pshx
 	pshy
-	jsr	ClearShape
-	ldd	CursorInit
+	jsr	ClearShape	;Clears Old shape
+	ldd	CursorInit	
 	addd	stage_block_ptr
-	std	CCPointer
+	std	CCPointer	;Sets Cursor to correct location
 	std	CPointer
 	
-	ldx	block_ptr
+	ldx	block_ptr	;pointer to memory
 	
 	ldaa	#Mwrite	;init memory write
-	jsr	LCD_Command
+	jsr	LCD_Command	
 
 DrawShape1:	ldd	CPointer
 	jsr	UpdateCursor
@@ -422,12 +434,14 @@ UpdateCursor:	pshd
 	ldaa	#$46
 	jsr	LCD_Command
 	puld
-	jsr	LCD_Data
+	psha
 	tba
+	jsr	LCD_Data
+	pula
 	jsr	LCD_Data
 	rts
 
-;Draws single square within shape (void)	
+;Draws single square within shape (void) *WORKING	
 Square:	psha
 	pshx
 	ldx	#8
@@ -522,8 +536,9 @@ LCD_INIT_LOOP2:	dex
 	jsr	LCD_Command	;Overlay CMD
 	ldaa	#$1C
 	jsr	LCD_Data	;3 layers, Graphics,OR layers
-	
-	ldaa	#$4F	;Curser auto inc AP+1
+
+*Set Cursor increment to increment for memory clear	
+	ldaa	#$4C	;Curser auto inc AP+1
 	jsr	LCD_Command
 	
 *Set Cursor location
@@ -546,10 +561,14 @@ INIT_L2_RAM:	ldaa	#$00	;Zero
 	cpx	#$3000
 	bne	INIT_L2_RAM
 	
+*Set Cursor increment to increment for program	
+	ldaa	#$4F	;Curser auto inc AP+1
+	jsr	LCD_Command
+	
 *Turn on Display	
 	ldaa	#$59
 	jsr	LCD_Command	;Display On
-	ldaa	#%01010100	;Layer 1,2 on layer 3,4, curser off
+	ldaa	#%00010100	;Layer 1,2 on layer 3,4, curser off
 	jsr	LCD_Data
 *Set CGRAM
 ;	ldaa	#$5C
