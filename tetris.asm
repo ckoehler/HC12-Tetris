@@ -62,6 +62,7 @@ stage_block_ptr	rmb	1
 collision	rmb	1
 
 temp	rmb	1
+block_1	rmb	1
 
 	org	$1000
 * ========
@@ -78,11 +79,11 @@ Init:
 	jsr	InitCurPointers
 	
 ;************TESTING ONLY**********************	
-;	ldd	#$0000
-;	jsr	UpdateCursor
-;	ldaa	#Mwrite
-;	jsr	LCD_Command
-;	jsr	Square
+	ldd	#$0000
+	jsr	UpdateCursor
+	ldaa	#Mwrite
+	jsr	LCD_Command
+	jsr	Square
 ;***********TESTING ONLY***********************
 
 ;Jump to Main
@@ -93,7 +94,7 @@ SPI_INIT:
 	ldab	DDRS	*Load Current state of DDRS
 	orab	#%11100000	*Define output ports for Port S
 	stab	DDRS	*store
-	ldab	#%01011100	*Enable SPI
+	ldab	#%01011101	*Enable SPI
 	stab	SP0CR1
 	ldab	#%00000101	* set rate to 125kHz
 	stab	SP0BR
@@ -104,6 +105,18 @@ SPI_INIT:
 
 Var_Init:	ldaa	#4
 	staa	block_height
+* 	because of the broken controller, "no buttons pushed"
+* 	is $01 for the first set of buttons, and $C1 for the second
+	ldaa	#$01
+	staa	buttons1l
+	ldaa	#$C1
+	staa	buttons2l
+* 	Testing a block, so preloading it here
+	ldaa	#$10
+	staa	block_1
+	ldd	#block_1
+	std	block_ptr
+* 	Testing done
 	rts
 
 * ========
@@ -114,28 +127,30 @@ Main:
 	
 * check for left button
 	ldaa	buttons1
-	anda	#$01
-	beq	Main1
+	cmpa	#$81
+	bne	Main1
 	jsr	move_left
 Main1:
 * check for right button
 	ldaa	buttons1
-	anda	#$04
-	beq	Main2
+	cmpa	#$61
+	bne	Main2
 	jsr	move_right
 Main2:
-* check for rotate left (X)
+	
+* check for rotate left (triangle)
 	ldaa	buttons2
-	anda	#$2
-	beq	Main3
+	cmpa	#$F1
+	bne	Main3
 	jsr	rotate_left
 Main3:
 * check for rotate right (O)
 	ldaa	buttons2
-	anda	#$4
-	beq	Main4
+	cmpa	#$E1
+	bne	Main4
 	jsr	rotate_right
 Main4:
+	jsr	delay_small
 	bra	Main
 
 * ========
@@ -144,8 +159,9 @@ Main4:
 
 * saves buttons in buttons1 and buttons2
 get_buttons:
+	psha
 	jsr	Pad_En
-	ldab	#$80	* send Hello to pad
+	ldab	#$01	* send Hello to pad
 	jsr	Pad_RW
 	ldab	#$42	* now send request for data
 	jsr	Pad_RW	* after this we get Pad ID
@@ -154,20 +170,38 @@ get_buttons:
 	ldab	#$00
 	jsr	Pad_RW
 	comb
-	stab	temp
-	eorb	buttons1l
-	andb	temp
+	cmpb	buttons1l
+	bne	get_buttons1
+	clr	buttons1
+	bra	get_buttons2
+get_buttons1:
 	stab	buttons1
+	stab	buttons1l
+get_buttons2:
 	ldab	#$00
 	jsr	Pad_RW
 	comb
-	stab	temp
-	eorb	buttons2l
-	andb	temp
+	cmpb	buttons2l
+	bne	get_buttons3
+	clr	buttons2
+	bra	get_buttons4
+get_buttons3:
 	stab	buttons2
+	stab	buttons2l
+get_buttons4:
 	jsr	Pad_En
+	pula
 	rts
-
+	
+	
+delay_small:      pshx
+                  ldx               #$0000
+delay_small_1:    cpx               #$00
+                  beq               delay_small_end
+                  dex
+                  bra               delay_small_1
+delay_small_end:  pulx
+                  rts
 
 * =======================
 * = SPI utility methods =
@@ -624,6 +658,9 @@ STR_rotateright:	fcc	"rotate right!"
 	fcb	10,13,0
 		
 STR_rotateleft:	fcc	"rotate left!"
+	fcb	10,13,0
+
+STR_test:	fcc	"Test!"
 	fcb	10,13,0
 * ===========
 * = Vectors =
