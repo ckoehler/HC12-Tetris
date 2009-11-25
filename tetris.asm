@@ -41,7 +41,7 @@ stage_end	rmb	1
 
 * points to the bottom memory location that defines
 * the block shape
-block_ptr	rmb	1
+block_ptr	rmb	2
 
 * it's the block height
 block_height	rmb	1
@@ -263,7 +263,7 @@ Output_Char1:	ldab	SC0SR1	* check to see if the transmit register is empty
 * we can't shift anything left. Otherwise, we do the actual
 * shifting
 move_left:
-	ldx	#block_ptr
+	ldx	block_ptr
 	ldab	block_height
 move_left_1:
 	ldaa	0,x
@@ -275,7 +275,7 @@ move_left_1:
 	beq	move_left_2
 	bra	move_left_1
 
-move_left_2:	ldx	#block_ptr
+move_left_2:	ldx	block_ptr
 	ldab	block_height
 move_left_3:
 	ldaa	0,x
@@ -292,7 +292,7 @@ move_left_end:
 * we can't shift anything right. Otherwise, we do the actual
 * shifting
 move_right:
-	ldx	#block_ptr
+	ldx	block_ptr
 	ldab	block_height
 move_right_1:
 	ldaa	0,x
@@ -304,7 +304,7 @@ move_right_1:
 	beq	move_right_2
 	bra	move_right_1
 
-move_right_2:	ldx	#block_ptr
+move_right_2:	ldx	block_ptr
 	ldab	block_height
 move_right_3:
 	ldaa	0,x
@@ -337,7 +337,7 @@ check_hcol_l:
 check_hcol_l1:
 * first make sure if any line of the block
 * already occupies bit 7
-	ldaa	block_ptr
+	ldd	block_ptr
 	anda	#$80
 	beq	check_hcol_l1
 	jsr	set_collision
