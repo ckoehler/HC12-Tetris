@@ -46,9 +46,23 @@ block_ptr	rmb	2
 * it's the block height
 block_height	rmb	1
 
-* Select _ _ Start U R D L
+* The following hex codes for buttons are only
+* necessary to work around our broken controller.
+* 01 = no buton pressed
+* 03 = Select
+* 19 = Start
+* 81 = Left
+* 61 = Right
+* C1 = Down
 buttons1	rmb	1
-* L2 R2 L1 R1 Triangle O X Square
+
+* C1 = no button pressed
+* E1 = circle
+* F1 = square
+* D9 = R1
+* CD = L1
+* C7 = R2
+* C3 = L2
 buttons2	rmb	1
 
 * saves last button configs
