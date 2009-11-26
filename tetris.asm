@@ -676,6 +676,102 @@ STR_rotateleft:	fcc	"rotate left!"
 
 STR_test:	fcc	"Test!"
 	fcb	10,13,0
+	
+* ================== */
+* = LCD CHAR TABLE = */
+* ================== */
+
+
+Zero:	fcb	$00
+	fcb	$00
+	fcb	$7C
+	fcb	$A2
+	fcb	$92
+	fcb	$2A
+	fcb	$7C
+	fcb	$00
+	
+One:	fcb	$00
+	fcb	$00
+	fcb	$00
+	fcb	$01
+	fcb	$FE
+	fcb	$42
+	fcb	$00
+	fcb	$00
+	
+Two:	fcb	$00
+	fcb	$00
+	fcb	$42
+	fcb	$A2
+	fcb	$92
+	fcb	$8A
+	fcb	$46
+	fcb	$00
+	
+Three:	fcb	$00
+	fcb	$00
+	fcb	$8C
+	fcb	$D2
+	fcb	$A2
+	fcb	$82
+	fcb	$84
+	fcb	$00
+	
+Four:	fcb	$00
+	fcb	$00
+	fcb	$08
+	fcb	$FE
+	fcb	$48
+	fcb	$28
+	fcb	$18
+	fcb	$00
+	
+Five:	fcb	$00
+	fcb	$00
+	fcb	$9C
+	fcb	$A2
+	fcb	$A2
+	fcb	$A2
+	fcb	$E4
+	fcb	$00
+	
+Six:	fcb	$00
+	fcb	$00
+	fcb	$0C
+	fcb	$92
+	fcb	$92
+	fcb	$52
+	fcb	$3C
+	fcb	$00
+	
+Seven:	fcb	$00
+	fcb	$00
+	fcb	$C0
+	fcb	$A0
+	fcb	$90
+	fcb	$8E
+	fcb	$80
+	fcb	$00
+	
+Eight:	fcb	$00
+	fcb	$00
+	fcb	$6C
+	fcb	$92
+	fcb	$92
+	fcb	$92
+	fcb	$6C
+	fcb	$00
+	
+Nine:	fcb	$00
+	fcb	$00
+	fcb	$78
+	fcb	$94
+	fcb	$92
+	fcb	$92
+	fcb	$60
+	fcb	$00
+
 * ===========
 * = Vectors =
 * ===========
