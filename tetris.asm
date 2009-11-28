@@ -426,13 +426,30 @@ check_hcol_l1:
 	bne	check_hcol_lcol
 	dex
 	decb
-	beq	check_hcol_lend
+	beq	check_hcol_l2
 	bra	check_hcol_l1
-	
+* now that we checked bit 7, check collision
+* with the stage.
+check_hcol_l2:	
+	ldab	block_height
+	ldx	block_ptr
+	ldy	stage_block_ptr
+	ldy	stage_beg,y
+check_hcol_l3:
+	ldaa	0,x
+	lsla
+	anda	0,y
+	bne	check_hcol_lcol
+	dex
+	dey
+	dec
+	beq	check_hcol_lend
+	bra	check_hcol_l3
 check_hcol_lcol:
 	jsr	set_collision
 check_hcol_lend:
 	rts
+
 
 * check for horizontal collision right
 check_hcol_r:
@@ -446,14 +463,29 @@ check_hcol_r1:
 	bne	check_hcol_rcol
 	dex
 	decb
-	beq	check_hcol_rend
+	beq	check_hcol_r2
 	bra	check_hcol_r1
-	
+* now that we checked bit 7, check collision
+* with the stage.
+check_hcol_r2:	
+	ldab	block_height
+	ldx	block_ptr
+	ldy	stage_block_ptr
+	ldy	stage_beg,y
+check_hcol_r3:
+	ldaa	0,x
+	lsra
+	anda	0,y
+	bne	check_hcol_rcol
+	dex
+	dey
+	dec
+	beq	check_hcol_rend
+	bra	check_hcol_r3
 check_hcol_rcol:
 	jsr	set_collision
 check_hcol_rend:
 	rts
-
 
 
 * checks for vertical collisions 
