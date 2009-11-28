@@ -690,6 +690,14 @@ STR_rotateleft:	fcc	"rotate left!"
 STR_test:	fcc	"Test!"
 	fcb	10,13,0
 	
+* ==========
+* = Blocks =
+* ==========
+BLK_square	fcb	$C0,$C0,0,0
+BLK_tee	fcb	$40,$E0,0,0
+BLK_long	fcb	$F0,0,0,0
+
+	
 * ================== */
 * = LCD CHAR TABLE = */
 * ================== */
