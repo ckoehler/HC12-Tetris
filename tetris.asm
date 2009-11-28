@@ -242,7 +242,7 @@ get_buttons4:
 	
 	
 delay_small:      pshx
-                  ldx               #$0000
+                  ldx               #$8FFF
 delay_small_1:    cpx               #$00
                   beq               delay_small_end
                   dex
