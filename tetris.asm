@@ -153,6 +153,7 @@ InitStage:	jsr 	serve_block
 * = Main =
 * ========
 Main:
+	jsr     DrawShape
 	jsr	get_buttons
 	
 * check for left button
@@ -381,10 +382,10 @@ merge_blk2stg:
 merge_blk2stg_1:
 	ldaa	stage_block_ptr
 	ldx	#stage_beg, A
-	ldaa	x,0
+	ldaa	0,x
 	ldy	#block_ptr
-	oraa	Y
-	staa	x,0
+	oraa	0,y
+	staa	0,x
 	inx
 	iny
 	decb	
