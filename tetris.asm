@@ -82,8 +82,10 @@ stage_block_ptr	rmb	1
 * FF if vertical collision detected
 collision	rmb	1
 
-temp	rmb	1
-block_1	rmb	1
+temp	rmb	2
+shift_offset	rmb	1
+rot_offset	rmb	1
+cur_block_id	rmb	1
 
 	org	$1000
 * ========
@@ -133,12 +135,9 @@ Var_Init:	ldaa	#4
 	staa	buttons1l
 	ldaa	#$C1
 	staa	buttons2l
-* 	Testing a block, so preloading it here
-	ldaa	#$10
-	staa	block_1
-	ldd	#block_1
-	std	block_ptr
-* 	Testing done
+	clr	shift_offset
+	ldaa	#128
+	staa	rot_offset
 	rts
 
 InitTimer:	ldaa	#$02	;TC1 Timer
@@ -149,8 +148,9 @@ InitTimer:	ldaa	#$02	;TC1 Timer
 	std	TC1
 	rts
 	
-InitStage:	jsr 	serve_block
-	jsr     DrawShape
+InitStage:	jsr	determine_block
+	jsr 	serve_block
+	jsr    	DrawShape
 	rts
 		
 * ========
@@ -308,46 +308,58 @@ Output_Char1:	ldab	SC0SR1	* check to see if the transmit register is empty
 
 * shift block left
 move_left:
-        ldx	#STR_moveleft
+        	ldx	#STR_moveleft
 	jsr	Output
 	ldx	block_ptr
 	ldab	block_height
 move_left_1:
 	ldaa	0,x
 	lsla
-	staa    0,x
+	staa    	0,x
  	dex
 	decb
 	beq	move_left_end
 	bra	move_left_1
 move_left_end:
+	ldaa	shift_offset
+	deca
+	staa	shift_offset
 	rts
 
 * shift the block right
 move_right:
-        ldx	#STR_moveright
+        	ldx	#STR_moveright
 	jsr	Output
 	ldx	block_ptr
 	ldab	block_height
 move_right_1:
 	ldaa	0,x
 	lsra
-	staa    0,x
+	staa   	0,x
 	dex
 	decb
 	beq	move_right_end
 	bra	move_right_1
 move_right_end:
+	ldaa	shift_offset
+	inca
+	staa	shift_offset
 	rts
 
 rotate_left:
 	ldx	#STR_rotateleft
 	jsr	Output
+	inc	rot_offset
+	ldab	cur_block_id
+	jsr	serve_block
 	rts
 	
 rotate_right:
 	ldx	#STR_rotateright
 	jsr	Output
+	dec	rot_offset
+	ldab	cur_block_id
+	jsr	serve_block
 	rts
 
 move_down:	ldx	block_ptr	
@@ -363,6 +375,8 @@ move_down:	ldx	block_ptr
 	bra	move_down_end
 move_down_1
 	jsr	merge_blk2stg
+	jsr	determine_block
+	jsr	serve_block
 move_down_end:	
 	rts
 * ===================
@@ -385,22 +399,39 @@ merge_blk2stg_1:
 	rts
 
 
-* serve a random block
-serve_block:
-;	ldd	TCNT
-;	ldx	#3
-;	idiv
+determine_block:
+	ldaa	#128
+	staa	rot_offset
+	ldd	TCNT
+	ldx	#3
+	idiv
 * now we have a number from 0-2 in D/B
+	stab	cur_block_id
+	rts
 
-* this is the number of bytes per block to calc offset
-;	ldaa	#$4
-;	mul
+* serve the block with ID given in B
+serve_block:
+* this is the number of bytes per block to calc offset.
+* it lands us at the right block type.
+	ldaa	#16
+	mul
 * now we have the offset from the first block in D
+	std	temp
+	
+* get rotation offset. Result will be one of [0-3].
+	ldd	rot_offset
+	ldx	#4
+	idiv
+	addd	temp
+* now we know which rotation. Multiply by 4 to get number
+* of bytes
+	ldaa	#4
+	mul
 	ldx	#BLK_square
 	inx
 	inx
 	inx
-;	ldx	[D,x]
+	ldx	[D,x]
 * now we have a random block in X
  	stx	block_ptr
 	ldaa	#$4
@@ -845,9 +876,18 @@ STR_test:	fcc	"Test!"
 * ==========
 * = Blocks =
 * ==========
-BLK_square	fcb	$C0,$C0,0,0
-BLK_tee	fcb	$40,$E0,0,0
-BLK_long	fcb	$F0,0,0,0
+BLK_squareU	fcb	$C0,$C0,0,0
+BLK_squareL	fcb	$C0,$C0,0,0
+BLK_squareD	fcb	$C0,$C0,0,0
+BLK_squareR	fcb	$C0,$C0,0,0
+BLK_teeU	fcb	$40,$E0,0,0
+BLK_teeL	fcb	$40,$C0,$40,0
+BLK_teeD	fcb	$E0,$40,0,0
+BLK_teeR	fcb	$80,$C0,$80,0
+BLK_longU	fcb	$F0,0,0,0
+BLK_longL	fcb	$80,$80,$80,$80
+BLK_longD	fcb	$F0,0,0,0
+BLK_longR	fcb	$80,$80,$80,$80
 
 	
 * ================== */
