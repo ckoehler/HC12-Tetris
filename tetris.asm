@@ -292,61 +292,29 @@ Output_Char1:	ldab	SC0SR1	* check to see if the transmit register is empty
 * = Button actions =
 * ==================
 
-* make two passes: first, just check for $80. If we find it
-* we can't shift anything left. Otherwise, we do the actual
-* shifting
-move_left:
-	ldx	block_ptr
+* shift block left
+move_left:	ldx	block_ptr
 	ldab	block_height
 move_left_1:
 	ldaa	0,x
-	inx
-	decb
-	anda	#$80
-	beq	move_left_end
-	cmpb	#0
-	beq	move_left_2
-	bra	move_left_1
-
-move_left_2:	ldx	block_ptr
-	ldab	block_height
-move_left_3:
-	ldaa	0,x
-	inx
-	decb
 	lsla
-	cmpb	#0
+	inx
+	decb
 	beq	move_left_end
-	bra	move_left_3
+	bra	move_left_1
 move_left_end:
 	rts
 
-* make two passes: first, just check for $01. If we find it
-* we can't shift anything right. Otherwise, we do the actual
-* shifting
-move_right:
-	ldx	block_ptr
+* shift the block right
+move_right:	ldx	block_ptr
 	ldab	block_height
 move_right_1:
 	ldaa	0,x
-	inx
-	decb
-	anda	#$01
-	beq	move_right_end
-	cmpb	#0
-	beq	move_right_2
-	bra	move_right_1
-
-move_right_2:	ldx	block_ptr
-	ldab	block_height
-move_right_3:
-	ldaa	0,x
-	inx
-	decb
 	lsra
-	cmpb	#0
+	dex
+	decb
 	beq	move_right_end
-	bra	move_right_3
+	bra	move_right_1
 move_right_end:
 	rts
 
