@@ -29,7 +29,7 @@ BIT_2	equ	4	;/WRITE
 BIT_3	equ	8	;/CS
 BIT_4	equ	16	;A0
 
-CursorInit	equ	#$0000	;Initial Condition for LCD stage
+CursorInit	equ	$0005	;Initial Condition for LCD stage
 
 Mwrite	equ	$42	;Memory write command for LCD
 
@@ -101,6 +101,30 @@ Init:
 	jsr	InitStage
 ;************TESTING ONLY**********************	
 	ldd	#$0000
+	jsr	UpdateCursor
+	ldaa	#Mwrite
+	jsr	LCD_Command
+	jsr	Square
+	
+	ldd	#$0001
+	jsr	UpdateCursor
+	ldaa	#Mwrite
+	jsr	LCD_Command
+	jsr	Square
+	
+	ldd	#$0002
+	jsr	UpdateCursor
+	ldaa	#Mwrite
+	jsr	LCD_Command
+	jsr	Square
+	
+	ldd	#$0003
+	jsr	UpdateCursor
+	ldaa	#Mwrite
+	jsr	LCD_Command
+	jsr	Square
+	
+	ldd	#$0200
 	jsr	UpdateCursor
 	ldaa	#Mwrite
 	jsr	LCD_Command
@@ -509,8 +533,9 @@ set_collision:
 * ======= *
 
 InitCurPointers:	pshd
-	ldd	CursorInit
+	ldd	#CursorInit
 	std	CPointer
+	addd    #3
 	std	CCPointer
 	puld
 	rts
@@ -520,21 +545,22 @@ DrawShape:	pshd
 	pshx
 	pshy
 	jsr	ClearShape	;Clears Old shape
-	ldd	CursorInit	
+	ldd	#CursorInit
 	addd	stage_block_ptr
 	std	CCPointer	;Sets Cursor to correct location
 	std	CPointer
 	
 	ldx	block_ptr	;pointer to memory
 	
-	ldaa	#Mwrite	;init memory write
-	jsr	LCD_Command	
 
 DrawShape1:	ldd	CPointer
 	jsr	UpdateCursor
 	ldaa	1,x-
 	ldy	#8
-DrawShape2:	lsla	
+	ldaa	#Mwrite	;init memory write
+	jsr	LCD_Command
+DrawShape2:	lsla
+
 	bcs	Square
 	dey
 	bne	DrawShape2	
@@ -545,7 +571,7 @@ DrawShape2:	lsla
 	std	CPointer
 	TFR	x,d
 	addd	#4
-	cmpd	block_ptr
+	cpd	block_ptr
 	bne	DrawShape1	
 	puly
 	pulx
@@ -558,15 +584,15 @@ ClearShape:	pshd
 	pshy
 	ldd	CCPointer
 	jsr	UpdateCursor	;Set Cursor to start of shape
-	ldy	#4	
-	ldaa	#Mwrite
+	ldy	#4
+ClearShape1:    ldaa	#Mwrite
 	jsr	LCD_Command
-ClearShape1:	ldaa	#$00
+	ldaa	#$00
 	ldx	#78
 ClearShape2:	jsr	LCD_Data
 	dex
 	bne	ClearShape2
-	dey	
+
 	
 	ldd	CCPointer
 	xgdx
@@ -575,9 +601,9 @@ ClearShape2:	jsr	LCD_Data
 	std	CCPointer
 	jsr	UpdateCursor
 	
+	dey
 	bne	ClearShape1
-	bra	ClearShape_RTS
-ClearShape_RTS:	puly
+	puly
 	pulx
 	puld
 	rts
