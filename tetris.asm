@@ -307,12 +307,16 @@ Output_Char1:	ldab	SC0SR1	* check to see if the transmit register is empty
 * ==================
 
 * shift block left
-move_left:	ldx	block_ptr
+move_left:
+        ldx	#STR_moveleft
+	jsr	Output
+	ldx	block_ptr
 	ldab	block_height
 move_left_1:
 	ldaa	0,x
 	lsla
-	inx
+	staa    0,x
+ 	dex
 	decb
 	beq	move_left_end
 	bra	move_left_1
@@ -320,11 +324,15 @@ move_left_end:
 	rts
 
 * shift the block right
-move_right:	ldx	block_ptr
+move_right:
+        ldx	#STR_moveright
+	jsr	Output
+	ldx	block_ptr
 	ldab	block_height
 move_right_1:
 	ldaa	0,x
 	lsra
+	staa    0,x
 	dex
 	decb
 	beq	move_right_end
