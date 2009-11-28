@@ -142,8 +142,10 @@ Var_Init:	ldaa	#4
 
 InitTimer:	ldaa	#$02	;TC1 Timer
 	staa	TIOS
-	ldaa	#$80	;Enable Timer
+	ldaa	#$87	;Enable Timer
 	staa	TSCR
+	ldd	#$FFFF
+	std	TC1
 	rts
 	
 InitStage:	jsr 	serve_block
