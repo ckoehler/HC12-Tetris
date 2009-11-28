@@ -440,7 +440,7 @@ check_hcol_r:
 	ldx	block_ptr
 check_hcol_r1:
 * first make sure if any line of the block
-* already occupies bit 7
+* already occupies bit 0
 	ldaa	0,x
 	anda	#$01
 	bne	check_hcol_rcol
