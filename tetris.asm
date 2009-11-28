@@ -529,14 +529,14 @@ LCD_INIT:
 	ldaa	#$1F
 	staa	PORTG	;Init PORTG
 	
-	BCLR	PORTG,BIT_0	;RESET LOW
+	bclr	PORTG,BIT_0	;RESET LOW
 	
 ;***************** Need 3ms Delay
 	ldx	#$FFFF
 LCD_INIT_LOOP1:	dex	
 	bne	LCD_INIT_LOOP1	
 
-	BSET	PORTG,BIT_0	;Reset Complete PORTG
+	bset	PORTG,BIT_0	;Reset Complete PORTG
 	
 	ldx	#$FFFF
 LCD_INIT_LOOP2:	dex
@@ -652,22 +652,22 @@ INIT_L2_RAM:	ldaa	#$00	;Zero
 	
 LCD_Command:
 	pshb
-	BSET	PORTG,BIT_4	;Set A0
+	bset	PORTG,BIT_4	;Set A0
 	staa	PORTH	;Write Command
-	BSET	PORTG,BIT_1	;Read disabled
-	BCLR	PORTG,BIT_3	;CS enabled
-	BCLR	PORTG,BIT_2	;Write enabled
+	bset	PORTG,BIT_1	;Read disabled
+	bclr	PORTG,BIT_3	;CS enabled
+	bclr	PORTG,BIT_2	;Write enabled
 	movb	#$FF,PORTG	;Restore PG
 	pulb
 	rts
 	
 LCD_Data:	
 	pshb
-	BCLR	PORTG,BIT_4	;Clear A0
+	bclr	PORTG,BIT_4	;Clear A0
 	staa	PORTH	;Write Data
-	BSET	PORTG,BIT_1	;Read disabled
-	BCLR	PORTG,BIT_3	;CS enabled
-	BCLR	PORTG,BIT_2	;Write enabled
+	bset	PORTG,BIT_1	;Read disabled
+	bclr	PORTG,BIT_3	;CS enabled
+	bclr	PORTG,BIT_2	;Write enabled
 	movb	#$FF,PORTG	;Restore PG
 	pulb
 	rts
