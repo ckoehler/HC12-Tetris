@@ -547,15 +547,17 @@ DrawShape:	pshd
 
 DrawShape1:	ldd	CPointer
 	jsr	UpdateCursor
-        ldaa	#Mwrite	;init memory write
+        	ldaa	#Mwrite	;init memory write
 	jsr	LCD_Command
 	ldaa	1,x-
 	ldy	#8
 DrawShape2:	lsla
 
-	bcs     DrawShape3
-	bra     DrawShape4
-DrawShape3:     jsr Square
+	bcs     	DrawShape3
+	jsr	Blank
+	bra     	DrawShape4
+DrawShape3:     	jsr 	Square
+	bra	DrawShape4
 DrawShape4:	dey
 	bne	DrawShape2	
 	ldd	CPointer
@@ -601,6 +603,27 @@ ClearShape2:	jsr	LCD_Data
 	pulx
 	puld
 	rts
+	
+DrawStage:	pshx
+	pshd
+	ldd	#CursorInit
+	xgdx	
+	dex
+	xgdx
+	addd	#$1000
+	jsr	UpdateCursor
+	ldaa	#Mwrite
+	jsr	LCD_Command
+	ldaa	#%1000111
+	ldx	#$78
+DrawStage1:	jsr	LCD_Data
+	dex
+	bne	DrawStage1
+	
+	ldx	stage_beg
+	puld
+	pulx
+	rts
 
 ;Requires D have cursor position (D)	
 UpdateCursor:	pshd
@@ -622,6 +645,17 @@ Square1:	ldaa	#$FF
 	jsr	LCD_Data
 	dex
 	bne	Square1
+	pulx
+	pula
+	rts
+	
+Blank:	psha
+	pshx
+	ldx	#8
+Blank1:	ldaa	#$00
+	jsr	LCD_Data
+	dex
+	bne	Blank1
 	pulx
 	pula
 	rts
