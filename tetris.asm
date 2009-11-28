@@ -352,8 +352,11 @@ rotate_left:
 rotate_right:
 	ldx	#STR_rotateright
 	jsr	Output
-	rts	
+	rts
+
+move_down	ldx	block_ptr	
 	
+	rts
 * ===================
 * = Game Logic subs =
 * ===================
