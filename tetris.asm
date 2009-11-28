@@ -155,7 +155,7 @@ InitStage:	jsr 	serve_block
 * = Main =
 * ========
 Main:
-	jsr     DrawShape
+	jsr    	DrawShape
 	jsr	get_buttons
 	
 * check for left button
@@ -414,17 +414,44 @@ serve_block:
 	staa	stage_block_ptr
 	rts
 
-* check for horizontal collision
+* check for horizontal collision left
 check_hcol_l:
 	ldab	block_height
+	ldx	block_ptr
 check_hcol_l1:
 * first make sure if any line of the block
 * already occupies bit 7
-	ldd	block_ptr
+	ldaa	0,x
 	anda	#$80
-	beq	check_hcol_l1
+	bne	check_hcol_lcol
+	dex
+	decb
+	beq	check_hcol_lend
+	bra	check_hcol_l1
+	
+check_hcol_lcol:
 	jsr	set_collision
-check_hcol_end:
+check_hcol_lend:
+	rts
+
+* check for horizontal collision right
+check_hcol_r:
+	ldab	block_height
+	ldx	block_ptr
+check_hcol_r1:
+* first make sure if any line of the block
+* already occupies bit 7
+	ldaa	0,x
+	anda	#$01
+	bne	check_hcol_rcol
+	dex
+	decb
+	beq	check_hcol_rend
+	bra	check_hcol_r1
+	
+check_hcol_rcol:
+	jsr	set_collision
+check_hcol_rend:
 	rts
 
 
