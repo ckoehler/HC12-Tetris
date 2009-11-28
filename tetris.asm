@@ -150,32 +150,34 @@ InitTimer:	ldaa	#$02	;TC1 Timer
 	rts
 	
 InitStage:	jsr 	serve_block
+	jsr     DrawShape
 	rts
 		
 * ========
 * = Main =
 * ========
 Main:
-	jsr    	DrawShape
 	jsr	get_buttons
 	
 * check for left button
 	ldaa	buttons1
 	cmpa	#$81
 	bne	Main1
-	jsr	check_hcol_l
-	ldaa	collision
-	bne	Main1
+;	jsr	check_hcol_l
+;	ldaa	collision
+;	bne	Main1
 	jsr	move_left
+	jsr    	DrawShape
 Main1:
 * check for right button
 	ldaa	buttons1
 	cmpa	#$61
 	bne	Main2
-	jsr	check_hcol_r
-	ldaa	collision
-	bne	Main2
+;	jsr	check_hcol_r
+;	ldaa	collision
+;	bne	Main2
 	jsr	move_right
+	jsr    	DrawShape
 Main2:
 	
 * check for rotate left (triangle)
