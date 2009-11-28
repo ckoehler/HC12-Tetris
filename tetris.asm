@@ -98,7 +98,7 @@ Init:
 ;LCD Init	
 	jsr	LCD_INIT
 	jsr	InitCurPointers
-	
+	jsr	InitStage
 ;************TESTING ONLY**********************	
 	ldd	#$0000
 	jsr	UpdateCursor
@@ -144,6 +144,9 @@ InitTimer:	ldaa	#$02	;TC1 Timer
 	staa	TIOS
 	ldaa	#$80	;Enable Timer
 	staa	TSCR
+	rts
+	
+InitStage:	jsr 	serve_block
 	rts
 		
 * ========
