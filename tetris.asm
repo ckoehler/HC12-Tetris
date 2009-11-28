@@ -672,6 +672,15 @@ LCD_Data:
 	pulb
 	rts
 
+* ========
+* = ISRs =
+* ========
+
+* this ISR moves the block down one space periodically
+ISR_Timer:
+
+	rti
+
 * ====================
 * = Constant strings =
 * ====================
@@ -796,3 +805,5 @@ Nine:	fcb	$00
 * ===========
 * = Vectors =
 * ===========
+	org	$62c
+	fdb	ISR_Timer
