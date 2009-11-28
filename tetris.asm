@@ -354,8 +354,20 @@ rotate_right:
 	jsr	Output
 	rts
 
-move_down	ldx	block_ptr	
-	
+move_down:	ldx	block_ptr	
+	jsr	check_vcol
+	ldaa	collision
+	cmpa	#$FF
+* if we have a collision, merge block into the stage.
+* else increment stage block pointer
+	beq	move_down_1
+	ldaa	stage_block_ptr
+	inca
+	staa	stage_block_ptr
+	bra	move_down_end
+move_down_1
+	jsr	merge_block_to_stage
+move_down_end:	
 	rts
 * ===================
 * = Game Logic subs =
