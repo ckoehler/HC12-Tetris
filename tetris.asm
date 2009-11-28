@@ -387,19 +387,22 @@ merge_blk2stg_1:
 
 * serve a random block
 serve_block:
-	ldd	TCNT
-	ldx	#3
-	idiv
+;	ldd	TCNT
+;	ldx	#3
+;	idiv
 * now we have a number from 0-2 in D/B
 
 * this is the number of bytes per block to calc offset
-	ldaa	#$4
-	mul
+;	ldaa	#$4
+;	mul
 * now we have the offset from the first block in D
 	ldx	#BLK_square
-	ldx	[D,x]
+	inx
+	inx
+	inx
+;	ldx	[D,x]
 * now we have a random block in X
-	stx	block_ptr
+ 	stx	block_ptr
 	ldaa	#$4
 	staa	stage_block_ptr
 	rts
