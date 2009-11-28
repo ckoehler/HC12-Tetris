@@ -366,12 +366,28 @@ move_down:	ldx	block_ptr
 	staa	stage_block_ptr
 	bra	move_down_end
 move_down_1
-	jsr	merge_block_to_stage
+	jsr	merge_blk2stg
 move_down_end:	
 	rts
 * ===================
 * = Game Logic subs =
 * ===================
+
+merge_blk2stg:	
+	ldab	block_height
+merge_blk2stg_1:
+	ldaa	stage_block_ptr
+	ldx	#stage_beg, A
+	ldaa	x,0
+	ldy	#block_ptr
+	oraa	Y
+	staa	x,0
+	inx
+	iny
+	decb	
+	bne	merge_blk2stg_1
+	rts
+
 
 * serve a random block
 serve_block:
