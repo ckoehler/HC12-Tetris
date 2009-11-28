@@ -100,35 +100,12 @@ Init:
 	jsr	InitCurPointers
 	jsr	InitStage
 ;************TESTING ONLY**********************	
-	ldd	#$0000
-	jsr	UpdateCursor
-	ldaa	#Mwrite
-	jsr	LCD_Command
-	jsr	Square
-	
-	ldd	#$0001
-	jsr	UpdateCursor
-	ldaa	#Mwrite
-	jsr	LCD_Command
-	jsr	Square
-	
-	ldd	#$0002
-	jsr	UpdateCursor
-	ldaa	#Mwrite
-	jsr	LCD_Command
-	jsr	Square
-	
-	ldd	#$0003
-	jsr	UpdateCursor
-	ldaa	#Mwrite
-	jsr	LCD_Command
-	jsr	Square
-	
-	ldd	#$0200
-	jsr	UpdateCursor
-	ldaa	#Mwrite
-	jsr	LCD_Command
-	jsr	Square
+;	ldd	#$0005
+;	jsr	UpdateCursor
+;	ldaa	#Mwrite
+;	jsr	LCD_Command
+;	jsr	Square
+
 ;***********TESTING ONLY***********************
 
 ;Jump to Main
