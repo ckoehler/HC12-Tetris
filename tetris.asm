@@ -728,7 +728,7 @@ LCD_Data:
 
 * this ISR moves the block down one space periodically
 ISR_Timer:
-
+	jsr	move_down
 	rti
 
 * ====================
