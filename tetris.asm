@@ -185,12 +185,14 @@ Main2:
 	cmpa	#$F1
 	bne	Main3
 	jsr	rotate_left
+	jsr    	DrawShape
 Main3:
 * check for rotate right (O)
 	ldaa	buttons2
 	cmpa	#$E1
 	bne	Main4
 	jsr	rotate_right
+	jsr    	DrawShape
 Main4:
 * reset collision byte. It's a new dawn!
 	ldaa	#$00
