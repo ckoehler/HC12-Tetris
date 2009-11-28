@@ -620,9 +620,6 @@ Square1:	ldaa	#$FF
 	jsr	LCD_Data
 	dex
 	bne	Square1
-	ldaa	#$00
-	jsr	LCD_Data
-	jsr	LCD_Data
 	pulx
 	pula
 	rts
