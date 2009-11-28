@@ -547,14 +547,16 @@ DrawShape:	pshd
 
 DrawShape1:	ldd	CPointer
 	jsr	UpdateCursor
+        ldaa	#Mwrite	;init memory write
+	jsr	LCD_Command
 	ldaa	1,x-
 	ldy	#8
-	ldaa	#Mwrite	;init memory write
-	jsr	LCD_Command
 DrawShape2:	lsla
 
-	bcs	Square
-	dey
+	bcs     DrawShape3
+	bra     DrawShape4
+DrawShape3:     jsr Square
+DrawShape4:	dey
 	bne	DrawShape2	
 	ldd	CPointer
 	xgdx
