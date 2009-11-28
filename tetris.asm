@@ -16,6 +16,13 @@ DDRG	equ	$082A
 PORTH	equ	$0829	;Expanded Address of Data
 DDRH	equ	$082B
 
+TIOS	equ	$0880	;In/Out
+TCNT	equ	$0884	;CNT High
+TSCR	equ	$0886	;Control
+TMSK1	equ	$088C	;Enable flag
+TFLG1	equ	$088E	;Flags
+TC1	equ	$0892	;CNT Set
+
 BIT_0	equ	1	;/RESET
 BIT_1	equ	2	;/READ
 BIT_2	equ	4	;/WRITE
@@ -133,6 +140,12 @@ Var_Init:	ldaa	#4
 * 	Testing done
 	rts
 
+InitTimer:	ldaa	#$02	;TC1 Timer
+	staa	TIOS
+	ldaa	#$80	;Enable Timer
+	staa	TSCR
+	rts
+		
 * ========
 * = Main =
 * ========
