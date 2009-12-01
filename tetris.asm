@@ -427,7 +427,7 @@ serve_block:
 * of bytes
 	ldaa	#4
 	mul
-	ldx	#BLK_square
+	ldx	#BLK_squareU
 	inx
 	inx
 	inx
