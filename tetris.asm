@@ -419,7 +419,8 @@ serve_block:
 	std	temp
 	
 * get rotation offset. Result will be one of [0-3].
-	ldd	rot_offset
+	clrb
+	ldaa	rot_offset
 	ldx	#4
 	idiv
 	addd	temp
@@ -431,7 +432,7 @@ serve_block:
 	inx
 	inx
 	inx
-	ldx	[D,x]
+	leax	d,x
 * now we have a random block in X
  	stx	block_ptr
 	ldaa	#$4
