@@ -161,7 +161,7 @@ Main:
 	
 * check for left button
 	ldaa	buttons1
-	cmpa	#$81
+	cmpa	#$80
 	bne	Main1
 ;	jsr	check_hcol_l
 ;	ldaa	collision
@@ -171,7 +171,7 @@ Main:
 Main1:
 * check for right button
 	ldaa	buttons1
-	cmpa	#$61
+	cmpa	#$20
 	bne	Main2
 ;	jsr	check_hcol_r
 ;	ldaa	collision
@@ -182,14 +182,14 @@ Main2:
 	
 * check for rotate left (triangle)
 	ldaa	buttons2
-	cmpa	#$F1
+	cmpa	#$50
 	bne	Main3
 	jsr	rotate_left
 	jsr    	DrawShape
 Main3:
 * check for rotate right (O)
 	ldaa	buttons2
-	cmpa	#$E1
+	cmpa	#$60
 	bne	Main4
 	jsr	rotate_right
 	jsr    	DrawShape
