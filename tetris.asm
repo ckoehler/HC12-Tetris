@@ -163,9 +163,9 @@ Main:
 	ldaa	buttons1
 	cmpa	#$80
 	bne	Main1
-;	jsr	check_hcol_l
-;	ldaa	collision
-;	bne	Main1
+	jsr	check_hcol_l
+	ldaa	collision
+	bne	Main1
 	jsr	move_left
 	jsr    	DrawShape
 Main1:
@@ -173,12 +173,13 @@ Main1:
 	ldaa	buttons1
 	cmpa	#$20
 	bne	Main2
-;	jsr	check_hcol_r
-;	ldaa	collision
-;	bne	Main2
+	jsr	check_hcol_r
+	ldaa	collision
+	bne	Main2
 	jsr	move_right
 	jsr    	DrawShape
 Main2:
+	
 	
 * check for rotate left (triangle)
 	ldaa	buttons2
@@ -195,8 +196,7 @@ Main3:
 	jsr    	DrawShape
 Main4:
 * reset collision byte. It's a new dawn!
-	ldaa	#$00
-	staa	collision
+ 	clr 	collision
 	jsr	delay_small
 	bra	Main
 
@@ -242,7 +242,7 @@ get_buttons4:
 	
 	
 delay_small:      pshx
-                  ldx               #$8FFF
+                  ldx               #$0FFF
 delay_small_1:    cpx               #$00
                   beq               delay_small_end
                   dex
@@ -406,6 +406,7 @@ determine_block:
 	ldx	#3
 	idiv
 * now we have a number from 0-2 in D/B
+	clrb
 	stab	cur_block_id
 	rts
 
@@ -459,7 +460,7 @@ check_hcol_l2:
 	ldab	block_height
 	ldx	block_ptr
 	ldy	stage_block_ptr
-	ldy	stage_beg,y
+	leay	stage_beg,y
 check_hcol_l3:
 	ldaa	0,x
 	lsla
@@ -467,7 +468,7 @@ check_hcol_l3:
 	bne	check_hcol_lcol
 	dex
 	dey
-	dec
+	decb
 	beq	check_hcol_lend
 	bra	check_hcol_l3
 check_hcol_lcol:
@@ -496,7 +497,7 @@ check_hcol_r2:
 	ldab	block_height
 	ldx	block_ptr
 	ldy	stage_block_ptr
-	ldy	stage_beg,y
+	leay	stage_beg,y
 check_hcol_r3:
 	ldaa	0,x
 	lsra
@@ -504,7 +505,7 @@ check_hcol_r3:
 	bne	check_hcol_rcol
 	dex
 	dey
-	dec
+	decb
 	beq	check_hcol_rend
 	bra	check_hcol_r3
 check_hcol_rcol:
@@ -550,7 +551,7 @@ check_vcol_end:
 set_collision:
 	ldaa	#$FF
 	staa	collision	
-	jsr
+ 	rts
 	
 * ======= *
 * = LCD = *
@@ -583,7 +584,7 @@ DrawShape1:	ldd	CPointer
 	jsr	LCD_Command
 	ldaa	1,x-
 	ldy	#8
-DrawShape2:	lsla
+DrawShape2:	lsra
 
 	bcs     	DrawShape3
 	jsr	Blank
