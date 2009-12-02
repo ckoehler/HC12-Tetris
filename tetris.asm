@@ -41,6 +41,7 @@ Mwrite	equ	$42	;Memory write command for LCD
 * cursor pointers used to define location on screen	
 CPointer	rmb	2
 CCPointer	rmb	2
+CSPointer	rmb	2
 * define memory range to store the stage in.
 * stage = all unmovable pixels
 stage_beg	rmb	15
@@ -638,23 +639,46 @@ ClearShape2:	jsr	LCD_Data
 	rts
 	
 DrawStage:	pshx
+	pshy
 	pshd
-	ldd	#CursorInit
+	ldd	#CursorInit	;Load Starting Cursor Point on LCD for stage
+	std	CSPointer	;Set CSPointer to top of stage
 	xgdx	
 	dex
 	xgdx
-	addd	#$1000
-	jsr	UpdateCursor
-	ldaa	#Mwrite
+	addd	#$1000	;Move cursor up one and move into stage memory area on LCD
+	jsr	UpdateCursor	
+	ldaa	#Mwrite	;Draw divide line between score board and stage
 	jsr	LCD_Command
 	ldaa	#%1000111
 	ldx	#$78
 DrawStage1:	jsr	LCD_Data
 	dex
-	bne	DrawStage1
+	bne	DrawStage1	
 	
 	ldx	stage_beg
+DrawStage2:	ldd	CSPointer	;Update LCD Cursor for drawing blocks on stage
+	jsr	UpdateCursor
+	ldy	#8
+	ldaa	
+DrawStage3:	lsra
+	bcs	DrawStage4	;Draw Each block on stage
+	jsr	Blank
+	bra	DrawStage5
+DrawStage4:	jsr	Square
+	bra	DrawStage5
+DrawStage5:	dey
+	bne	DrawStage3
+	ldd	CSPointer
+	xgdx
+	inx
+	xgdx
+	std	CSPointer
+	dex
+	cpx	stage_end
+	bne	DrawStage2
 	puld
+	puly
 	pulx
 	rts
 
