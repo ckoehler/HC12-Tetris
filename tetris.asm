@@ -39,9 +39,12 @@ Mwrite	equ	$42	;Memory write command for LCD
 
 	org	$00
 * cursor pointers used to define location on screen	
-CPointer	rmb	2
-CCPointer	rmb	2
-CSPointer	rmb	2
+CPointer	rmb	2	;Pointer for current block
+CCPointer	rmb	2	;Pointer for clearning current block
+CSPointer	rmb	2	;Pointer for stage
+CHPointer	rmb	2	;Pointer for header
+* Score memory for game
+Score	rmb	1
 * define memory range to store the stage in.
 * stage = all unmovable pixels
 stage_beg	rmb	15
@@ -553,6 +556,49 @@ set_collision:
 	ldaa	#$FF
 	staa	collision	
  	rts
+
+* ========= *
+* = Score = *
+* ========= *
+
+ScoreKeeper:	pshd
+	pshx
+	pshy
+	ldd	CHPointer	
+;update pointer *******************************************	
+	ldab	Score
+	addb	#3
+	stab	Score
+	
+	ldx	#10
+	idiv
+	ldy	#NumTbl
+	leay	d,y
+	jsr	DrawScore
+	
+	xgdx	
+	ldx	#10
+	idiv	
+	ldy	#NumTbl
+	leay	d,y
+	jsr	DrawScore
+	
+	xgdx
+	ldy	#NumTbl
+	leay	d,y
+	jsr	DrawScore
+	
+	puly
+	pulx
+	puld
+	rts
+
+DrawScore:	pshx
+	ldx	0,y
+DrawScore1:	
+;DrawScore ***************************************************************
+	pulx
+	rts
 	
 * ======= *
 * = LCD = *
@@ -1010,6 +1056,9 @@ Nine:	fcb	$00
 	fcb	$92
 	fcb	$60
 	fcb	$00
+	
+	org	$2500
+NumTbl:	fcb	#Zero,#One,#Two,#Three,#Four,#Five,#Six,#Seven,#Eight,#Nine
 
 * ===========
 * = Vectors =
