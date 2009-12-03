@@ -142,6 +142,7 @@ Var_Init:	ldaa	#4
 	clr	shift_offset
 	ldaa	#128
 	staa	rot_offset
+	clr	Score
 	rts
 
 InitTimer:	ldaa	#$02	;TC1 Timer
