@@ -564,8 +564,21 @@ set_collision:
 ScoreKeeper:	pshd
 	pshx
 	pshy
-	ldd	CHPointer	
-;update pointer *******************************************	
+	ldd	#$2001	;Set cursor to beginning of line
+	std	CHPointer	
+	jsr	UpdateCursor
+;Clears Line	
+	ldaa	#Mwrite
+	jsr	LCD_Command
+	ldx	#$78
+ScoreKeeper1:	ldaa	#$00	;Clear line loop
+	jsr	LCD_Data
+	dex
+	bne	ScoreKeeper1
+
+	ldd	CHPointer	;Set Cursor Back to beginning of line
+	jsr	UpdateCursor
+;Hex to Decimal	
 	ldab	Score
 	addb	#3
 	stab	Score
@@ -594,9 +607,15 @@ ScoreKeeper:	pshd
 	rts
 
 DrawScore:	pshx
-	ldx	0,y
-DrawScore1:	
-;DrawScore ***************************************************************
+	ldx	0,y	;ldx with top memory address of CG number
+	ldaa	#Mwrite
+	jsr	LCD_Command
+	ldy	#8
+DrawScore1:	ldaa	1,x+
+	jsr	LCD_Data
+	dey
+	bne	DrawScore1
+	cly
 	pulx
 	rts
 	
