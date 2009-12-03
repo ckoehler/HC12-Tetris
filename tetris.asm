@@ -615,7 +615,6 @@ DrawScore1:	ldaa	1,x+
 	jsr	LCD_Data
 	dey
 	bne	DrawScore1
-	cly
 	pulx
 	rts
 	
