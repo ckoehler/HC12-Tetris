@@ -23,6 +23,7 @@ TMSK1	equ	$088C	;Enable flag
 TMSK2	equ	$088D	;prescaler
 TFLG1	equ	$088E	;Flags
 TC1	equ	$0892	;CNT Set
+TC2	equ	$0894
 
 BIT_0	equ	1	;/RESET
 BIT_1	equ	2	;/READ
@@ -95,7 +96,6 @@ Init:
 	cli
 	jsr	SPI_INIT
 	jsr	Var_Init
-	jsr	InitTimer
 
 ;LCD Init	
 	jsr	LCD_INIT
@@ -109,6 +109,8 @@ Init:
 ;	jsr	Square
 
 ;***********TESTING ONLY***********************
+
+	jsr	InitTimer
 
 ;Jump to Main
 	bra	Main
@@ -138,15 +140,13 @@ Var_Init:	ldaa	#4
 	rts
 
 InitTimer:
-	ldaa    #$5
-	staa    Time
 	ldd	#$FFFF
 	std	TC1
-	ldd	#$0001
+	ldd	#$0FFF
 	std	TC2
 	ldaa	#$07
 	staa	TMSK2
-	ldaa	#$06	;TC1 Timer
+	ldaa	#$06	;TC1, TC2 Timer
 	staa	TIOS
 	ldaa	#$80	;Enable Timer
 	staa	TSCR
@@ -157,7 +157,6 @@ InitTimer:
 InitStage:
 	jsr	determine_block
 	jsr 	serve_block
-	jsr    	DrawShape
 	rts
 		
 * ========
@@ -175,7 +174,6 @@ Main:
 	bne	Main4
 	jsr	move_left
 	dec     shift_offset
-	jsr    	DrawShape
 	bra	Main4
 Main1:
 * check for right button
@@ -187,7 +185,6 @@ Main1:
 	bne	Main4
 	jsr	move_right
 	inc	shift_offset
-	jsr    	DrawShape
 	bra	Main4
 Main2:
 	
@@ -201,7 +198,6 @@ Main2:
 	jsr	check_rcol
 	ldaa	collision
 	bne	Main2_1
-	jsr    	DrawShape
 	bra	Main4
 Main2_1:
 	jsr	revert_state
@@ -216,7 +212,6 @@ Main3:
 	jsr	check_rcol
 	ldaa	collision
 	bne	Main3_1
-	jsr    	DrawShape
 	bra	Main4
 Main3_1:
 	jsr	revert_state
@@ -1102,23 +1097,23 @@ LCD_Data:
 
 * this ISR moves the block down one space periodically
 ISR_Timer1:
-	pshx		
- 	jsr	move_down
+	psha		
+; 	jsr	move_down
 	ldaa	TFLG1
-	oraa	#$02	;Reset Flag
+	anda	#$02	;Reset Flag
 	staa	TFLG1
 	pula
 	rti
 	
-ISR_Timer2:	psha
+ISR_Timer2:	pshd
 	jsr	DrawShape
 	ldd	TCNT
-	addd	#$0005
+	addd	#$0FFF
 	std	TC2
 	ldaa	TFLG1
-	oraa	#$04
+	anda	#$04
 	staa	TFLG1
-	pula
+	puld
 	rti
 
 * ====================
