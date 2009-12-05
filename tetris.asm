@@ -131,14 +131,14 @@ Var_Init:	ldaa	#4
 	staa	block_height
 	ldaa	#128
 	staa	rot_offset
-	clr     shift_offset
+	clr     	shift_offset
 	clr	Score
 	rts
 
 InitTimer:
 	ldd	#$FFFF
 	std	TC1
-	ldaa	$#07
+	ldaa	#$07
 	staa	TMSK2
 	ldaa	#$02	;TC1 Timer
 	staa	TIOS
