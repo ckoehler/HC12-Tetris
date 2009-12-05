@@ -85,6 +85,8 @@ sav_block_ptr	rmb	2
 sav_shft_offset	rmb	1
 sav_rot_offset	rmb	1
 
+Time            rmb     1
+
 	org	$1000
 * ========
 * = Init =
@@ -136,6 +138,8 @@ Var_Init:	ldaa	#4
 	rts
 
 InitTimer:
+	ldaa    #$5
+	staa    Time
 	ldd	#$FFFF
 	std	TC1
 	ldaa	#$07
@@ -144,8 +148,8 @@ InitTimer:
 	staa	TIOS
 	ldaa	#$80	;Enable Timer
 	staa	TSCR
-*	ldaa	#$02
-*	staa	TMSK1
+	ldaa	#$02
+	staa	TMSK1
 	rts
 	
 InitStage:
@@ -320,8 +324,8 @@ move_left:
 	psha
 	pshx
 	pshb
-        	ldx	#STR_moveleft
-	jsr	Output
+*        	ldx	#STR_moveleft
+*	jsr	Output
 	ldx	block_ptr
 	ldab	block_height
 move_left_1:
@@ -343,8 +347,8 @@ move_right:
 	psha
 	pshx
 	pshb
-	ldx	#STR_moveright
-	jsr	Output
+*	ldx	#STR_moveright
+*	jsr	Output
 	ldx	block_ptr
 	ldab	block_height
 move_right_1:
@@ -364,8 +368,8 @@ move_right_end:
 rotate_left:
 	pshx
 	pshb
-	ldx	#STR_rotateleft
-	jsr	Output
+*	ldx	#STR_rotateleft
+*	jsr	Output
 	inc	rot_offset
 	ldab	cur_block_id
 	jsr	serve_block
@@ -376,8 +380,8 @@ rotate_left:
 rotate_right:
 	pshx
 	pshb
-	ldx	#STR_rotateright
-	jsr	Output
+*	ldx	#STR_rotateright
+*	jsr	Output
 	dec	rot_offset
 	ldab	cur_block_id
 	jsr 	serve_block
@@ -386,12 +390,12 @@ rotate_right:
 	rts
 
 move_down:	ldx	block_ptr	
-	jsr	check_vcol
-	ldaa	collision
-	cmpa	#$FF
+;	jsr	check_vcol
+;	ldaa	collision
+;	cmpa	#$FF
 * if we have a collision, merge block into the stage.
 * else increment stage block pointer
-	beq	move_down_1
+;	beq	move_down_1
 	ldaa	stage_block_ptr
 	inca
 	staa	stage_block_ptr
@@ -790,7 +794,7 @@ DrawShape:	pshd
 	pshy
 	jsr	ClearShape	;Clears Old shape
 	ldd	#CursorInit
-	addd	stage_block_ptr
+	addb	stage_block_ptr
 	std	CCPointer	;Sets Cursor to correct location
 	std	CPointer
 	
@@ -1098,11 +1102,13 @@ LCD_Data:
 ISR_Timer:
 	pshx
 	psha
-	ldx     	#STR_test
-	jsr     	Output
-	ldaa	#$02	;Reset Flag
+*	ldx     	#STR_test
+*	jsr     	Output
+
+ 	jsr	move_down
+; 	jsr     DrawShape
+ISR_T1:	ldaa	#$02	;Reset Flag
 	staa	TFLG1
-	jsr	move_down
 	pula
 	pulx
 	rti
