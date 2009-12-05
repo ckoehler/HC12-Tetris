@@ -412,7 +412,7 @@ merge_blk2stg_1:
 	ldaa	stage_block_ptr
 	ldx	#stage_beg, A
 	ldaa	0,x
-	ldy	#block_ptr
+	ldy	block_ptr
 	oraa	0,y
 	staa	0,x
 	inx
