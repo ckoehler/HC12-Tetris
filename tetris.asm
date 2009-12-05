@@ -1096,11 +1096,15 @@ LCD_Data:
 
 * this ISR moves the block down one space periodically
 ISR_Timer:
+	pshx
+	psha
 	ldx     	#STR_test
 	jsr     	Output
 	ldaa	#$02	;Reset Flag
 	staa	TFLG1
 	jsr	move_down
+	pula
+	pulx
 	rti
 
 * ====================
