@@ -112,7 +112,7 @@ SPI_INIT:
 	stab	DDRS	*store
 	ldab	#%01011101	*Enable SPI
 	stab	SP0CR1
-	ldab	#%00000101	* set rate to 125kHz
+	ldab	#%00000110	* set rate to 64kHz
 	stab	SP0BR
 	ldab	PORTS	
 	orab	#$80
