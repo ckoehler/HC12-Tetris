@@ -103,7 +103,7 @@ Init:
 ;***********TESTING ONLY***********************
 
 ;Jump to Main
-	jsr	Main
+	bra	Main
 
 *Init SPI
 SPI_INIT:
@@ -120,13 +120,9 @@ SPI_INIT:
 	rts
 
 Var_Init:	ldaa	#4
+	clr	buttons1l
+	clr	buttons2l
 	staa	block_height
-* 	because of the broken controller, "no buttons pushed"
-* 	is $01 for the first set of buttons, and $C1 for the second
-	ldaa	#$01
-	staa	buttons1l
-	ldaa	#$C1
-	staa	buttons2l
 	clr	shift_offset
 	ldaa	#128
 	staa	rot_offset
@@ -146,7 +142,8 @@ InitTimer:
 ;	staa	TMSK1
 	rts
 	
-InitStage:	jsr	determine_block
+InitStage:
+	jsr	determine_block
 	jsr 	serve_block
 	jsr    	DrawShape
 	rts
@@ -195,7 +192,6 @@ Main3:
 Main4:
 * reset collision byte. It's a new dawn!
  	clr 	collision
-;	jsr	delay_small
 	bra	Main
 
 * ========
@@ -237,16 +233,6 @@ get_buttons4:
 	jsr	Pad_En
 	pula
 	rts
-	
-	
-delay_small:      pshx
-                  ldx               #$0FFF
-delay_small_1:    cpx               #$00
-                  beq               delay_small_end
-                  dex
-                  bra               delay_small_1
-delay_small_end:  pulx
-                  rts
 
 * =======================
 * = SPI utility methods =
@@ -404,7 +390,6 @@ determine_block:
 	ldx	#3
 	idiv
 * now we have a number from 0-2 in D/B
-	clrb
 	stab	cur_block_id
 	rts
 
@@ -1074,7 +1059,7 @@ Nine:	fcb	$00
 	fcb	$00
 	
 	org	$2500
-NumTbl:	fcb	#Zero,#One,#Two,#Three,#Four,#Five,#Six,#Seven,#Eight,#Nine
+NumTbl:	fdb	#Zero,#One,#Two,#Three,#Four,#Five,#Six,#Seven,#Eight,#Nine
 
 * ===========
 * = Vectors =
