@@ -422,11 +422,11 @@ serve_block:
 	ldaa	rot_offset
 	ldx	#4
 	idiv
-	addd	temp
 * now we know which rotation. Multiply by 4 to get number
 * of bytes
 	ldaa	#4
 	mul
+	addd	temp
 	ldx	#BLK_squareU
 	inx
 	inx
