@@ -138,8 +138,8 @@ InitTimer:
 	staa	TIOS
 	ldaa	#$80	;Enable Timer
 	staa	TSCR
-;	ldaa	#$02
-;	staa	TMSK1
+*	ldaa	#$02
+*	staa	TMSK1
 	rts
 	
 InitStage:
@@ -162,6 +162,7 @@ Main:
 	ldaa	collision
 	bne	Main1
 	jsr	move_left
+	dec     shift_offset
 	jsr    	DrawShape
 Main1:
 * check for right button
@@ -172,6 +173,7 @@ Main1:
 	ldaa	collision
 	bne	Main2
 	jsr	move_right
+	inc	shift_offset
 	jsr    	DrawShape
 Main2:
 	
@@ -292,7 +294,10 @@ Output_Char1:	ldab	SC0SR1	* check to see if the transmit register is empty
 
 * shift block left
 move_left:
-        	ldx	#STR_moveleft
+	psha
+	pshx
+	pshb
+        ldx	#STR_moveleft
 	jsr	Output
 	ldx	block_ptr
 	ldab	block_height
@@ -305,14 +310,17 @@ move_left_1:
 	beq	move_left_end
 	bra	move_left_1
 move_left_end:
-	ldaa	shift_offset
-	deca
-	staa	shift_offset
+	pulb
+	pulx
+	pula
 	rts
 
 * shift the block right
 move_right:
-        	ldx	#STR_moveright
+	psha
+	pshx
+	pshb
+	ldx	#STR_moveright
 	jsr	Output
 	ldx	block_ptr
 	ldab	block_height
@@ -325,25 +333,33 @@ move_right_1:
 	beq	move_right_end
 	bra	move_right_1
 move_right_end:
-	ldaa	shift_offset
-	inca
-	staa	shift_offset
+	pulb
+	pulx
+	pula
 	rts
 
 rotate_left:
+	pshx
+	pshb
 	ldx	#STR_rotateleft
 	jsr	Output
 	inc	rot_offset
 	ldab	cur_block_id
 	jsr	serve_block
+	pulb
+	pulx
 	rts
 	
 rotate_right:
+	pshx
+	pshb
 	ldx	#STR_rotateright
 	jsr	Output
 	dec	rot_offset
 	ldab	cur_block_id
-	jsr	serve_block
+	jsr 	serve_block
+	pulb
+	pulx
 	rts
 
 move_down:	ldx	block_ptr	
@@ -390,11 +406,25 @@ determine_block:
 	ldx	#3
 	idiv
 * now we have a number from 0-2 in D/B
+	ldab    #01
 	stab	cur_block_id
+	ldaa	#$4
+	staa	stage_block_ptr
 	rts
 
 * serve the block with ID given in B
 serve_block:
+* shift the block back to initial position. Then, later, we
+* move it forward again to the right spot.
+* 
+	ldaa	shift_offset
+serve_block_1:
+	cmpa	#00
+	beq	serve_block_2
+	jsr	move_left
+	deca
+	bra	serve_block_1
+serve_block_2:
 * this is the number of bytes per block to calc offset.
 * it lands us at the right block type.
 	ldaa	#16
@@ -404,7 +434,7 @@ serve_block:
 	
 * get rotation offset. Result will be one of [0-3].
 	clrb
-	ldaa	rot_offset
+	ldab	rot_offset
 	ldx	#4
 	idiv
 * now we know which rotation. Multiply by 4 to get number
@@ -419,9 +449,23 @@ serve_block:
 	leax	d,x
 * now we have a random block in X
  	stx	block_ptr
-	ldaa	#$4
-	staa	stage_block_ptr
+
+* now shift the block back right
+	ldaa    shift_offset
+serve_block_3:
+	cmpa	#00
+	beq	serve_block_4
+	jsr	move_right
+	deca
+	bra	serve_block_3
+serve_block_4:
 	rts
+
+
+check_rot_collision:
+	
+	rts
+
 
 * check for horizontal collision left
 check_hcol_l:
