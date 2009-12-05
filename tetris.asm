@@ -57,23 +57,10 @@ block_ptr	rmb	2
 * it's the block height
 block_height	rmb	1
 
-* The following hex codes for buttons are only
-* necessary to work around our broken controller.
-* 01 = no buton pressed
-* 03 = Select
-* 19 = Start
-* 81 = Left
-* 61 = Right
-* C1 = Down
+* L D R U Start _ _ Select
 buttons1	rmb	1
 
-* C1 = no button pressed
-* E1 = circle
-* F1 = square
-* D9 = R1
-* CD = L1
-* C7 = R2
-* C3 = L2
+* Square X O /\ R1 L1 R2 L2
 buttons2	rmb	1
 
 * saves last button configs
@@ -166,8 +153,8 @@ Main:
 	
 * check for left button
 	ldaa	buttons1
-	cmpa	#$80
-	bne	Main1
+	anda	#$80
+	beq	Main1
 	jsr	check_hcol_l
 	ldaa	collision
 	bne	Main1
@@ -176,8 +163,8 @@ Main:
 Main1:
 * check for right button
 	ldaa	buttons1
-	cmpa	#$20
-	bne	Main2
+	anda	#$20
+	beq	Main2
 	jsr	check_hcol_r
 	ldaa	collision
 	bne	Main2
@@ -186,23 +173,23 @@ Main1:
 Main2:
 	
 	
-* check for rotate left (triangle)
+* check for rotate left (square)
 	ldaa	buttons2
-	cmpa	#$50
-	bne	Main3
+	anda	#$80
+	beq	Main3
 	jsr	rotate_left
 	jsr    	DrawShape
 Main3:
-* check for rotate right (O)
+* check for rotate right (X)
 	ldaa	buttons2
-	cmpa	#$60
-	bne	Main4
+	anda	#$40
+	beq	Main4
 	jsr	rotate_right
 	jsr    	DrawShape
 Main4:
 * reset collision byte. It's a new dawn!
  	clr 	collision
-	jsr	delay_small
+;	jsr	delay_small
 	bra	Main
 
 * ========
