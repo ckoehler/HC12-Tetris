@@ -142,13 +142,15 @@ InitTimer:
 	staa    Time
 	ldd	#$FFFF
 	std	TC1
+	ldd	#$0001
+	std	TC2
 	ldaa	#$07
 	staa	TMSK2
-	ldaa	#$02	;TC1 Timer
+	ldaa	#$06	;TC1 Timer
 	staa	TIOS
 	ldaa	#$80	;Enable Timer
 	staa	TSCR
-	ldaa	#$02
+	ldaa	#$06
 	staa	TMSK1
 	rts
 	
@@ -1099,18 +1101,24 @@ LCD_Data:
 * ========
 
 * this ISR moves the block down one space periodically
-ISR_Timer:
-	pshx
-	psha
-*	ldx     	#STR_test
-*	jsr     	Output
-
+ISR_Timer1:
+	pshx		
  	jsr	move_down
-; 	jsr     DrawShape
-ISR_T1:	ldaa	#$02	;Reset Flag
+	ldaa	TFLG1
+	oraa	#$02	;Reset Flag
 	staa	TFLG1
 	pula
-	pulx
+	rti
+	
+ISR_Timer2:	psha
+	jsr	DrawShape
+	ldd	TCNT
+	addd	#$0005
+	std	TC2
+	ldaa	TFLG1
+	oraa	#$04
+	staa	TFLG1
+	pula
 	rti
 
 * ====================
@@ -1263,4 +1271,7 @@ NumTbl:	fdb	#Zero,#One,#Two,#Three,#Four,#Five,#Six,#Seven,#Eight,#Nine
 * = Vectors =
 * ===========
 	org	$62c
-	fdb	ISR_Timer
+	fdb	ISR_Timer1
+	
+	org	$62a
+	fdb	ISR_Timer2
