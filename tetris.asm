@@ -20,6 +20,7 @@ TIOS	equ	$0880	;In/Out
 TCNT	equ	$0884	;CNT High
 TSCR	equ	$0886	;Control
 TMSK1	equ	$088C	;Enable flag
+TMSK2	equ	$088D	;prescaler
 TFLG1	equ	$088E	;Flags
 TC1	equ	$0892	;CNT Set
 
@@ -83,11 +84,11 @@ cur_block_id	rmb	1
 * = Init =
 * ========
 Init:	
+	cli
 	jsr	SPI_INIT
 	jsr	Var_Init
-	ldaa	#0
-	staa	buttons1l
-	staa	buttons2l
+	jsr	InitTimer
+
 ;LCD Init	
 	jsr	LCD_INIT
 	jsr	InitCurPointers
@@ -132,12 +133,17 @@ Var_Init:	ldaa	#4
 	clr	Score
 	rts
 
-InitTimer:	ldaa	#$02	;TC1 Timer
-	staa	TIOS
-	ldaa	#$87	;Enable Timer
-	staa	TSCR
+InitTimer:
 	ldd	#$FFFF
 	std	TC1
+	ldaa	$#07
+	staa	TMSK2
+	ldaa	#$02	;TC1 Timer
+	staa	TIOS
+	ldaa	#$80	;Enable Timer
+	staa	TSCR
+;	ldaa	#$02
+;	staa	TMSK1
 	rts
 	
 InitStage:	jsr	determine_block
@@ -930,6 +936,10 @@ LCD_Data:
 
 * this ISR moves the block down one space periodically
 ISR_Timer:
+	ldx     	#STR_test
+	jsr     	Output
+	ldaa	#$02	;Reset Flag
+	staa	TFLG1
 	jsr	move_down
 	rti
 
