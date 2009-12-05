@@ -79,6 +79,12 @@ shift_offset	rmb	1
 rot_offset	rmb	1
 cur_block_id	rmb	1
 
+
+* save state information here
+sav_block_ptr	rmb	2
+sav_shft_offset	rmb	1
+sav_rot_offset	rmb	1
+
 	org	$1000
 * ========
 * = Init =
@@ -123,9 +129,9 @@ Var_Init:	ldaa	#4
 	clr	buttons1l
 	clr	buttons2l
 	staa	block_height
-	clr	shift_offset
 	ldaa	#128
 	staa	rot_offset
+	clr     shift_offset
 	clr	Score
 	rts
 
@@ -160,10 +166,11 @@ Main:
 	beq	Main1
 	jsr	check_hcol_l
 	ldaa	collision
-	bne	Main1
+	bne	Main4
 	jsr	move_left
 	dec     shift_offset
 	jsr    	DrawShape
+	bra	Main4
 Main1:
 * check for right button
 	ldaa	buttons1
@@ -171,10 +178,11 @@ Main1:
 	beq	Main2
 	jsr	check_hcol_r
 	ldaa	collision
-	bne	Main2
+	bne	Main4
 	jsr	move_right
 	inc	shift_offset
 	jsr    	DrawShape
+	bra	Main4
 Main2:
 	
 	
@@ -182,15 +190,30 @@ Main2:
 	ldaa	buttons2
 	anda	#$80
 	beq	Main3
+	jsr	save_state
 	jsr	rotate_left
+	jsr	check_rcol
+	ldaa	collision
+	bne	Main2_1
 	jsr    	DrawShape
+	bra	Main4
+Main2_1:
+	jsr	revert_state
+	bra	Main4
 Main3:
 * check for rotate right (X)
 	ldaa	buttons2
 	anda	#$40
 	beq	Main4
+	jsr	save_state
 	jsr	rotate_right
+	jsr	check_rcol
+	ldaa	collision
+	bne	Main3_1
 	jsr    	DrawShape
+	bra	Main4
+Main3_1:
+	jsr	revert_state
 Main4:
 * reset collision byte. It's a new dawn!
  	clr 	collision
@@ -297,7 +320,7 @@ move_left:
 	psha
 	pshx
 	pshb
-        ldx	#STR_moveleft
+        	ldx	#STR_moveleft
 	jsr	Output
 	ldx	block_ptr
 	ldab	block_height
@@ -451,7 +474,7 @@ serve_block_2:
  	stx	block_ptr
 
 * now shift the block back right
-	ldaa    shift_offset
+	ldaa    	shift_offset
 serve_block_3:
 	cmpa	#00
 	beq	serve_block_4
@@ -462,10 +485,118 @@ serve_block_4:
 	rts
 
 
-check_rot_collision:
+
+save_state:
+	pshx
+	psha
+	ldx	block_ptr
+	stx	sav_block_ptr
+	ldaa	shift_offset
+	staa	sav_shft_offset
+	ldaa	rot_offset
+	staa	sav_rot_offset
+	pula
+	pulx
+	rts
 	
+revert_state:
+	pshx
+	pshd
+	ldab    block_height
+	ldx     block_ptr
+	leax	48,x
+	ldy     block_ptr
+revert_state_11
+	ldaa    0,x
+	staa    0,y
+	dex
+	dey
+	decb
+	bne     revert_state_11
+	
+	ldx     sav_block_ptr
+	stx	block_ptr
+	ldaa	sav_shft_offset
+	staa	shift_offset
+	ldaa	sav_rot_offset
+	staa	rot_offset
+	ldaa    shift_offset
+revert_state_1:
+	cmpa	#0
+	beq	revert_state_2
+	jsr	move_right
+	deca
+	bra	revert_state_1
+	
+revert_state_2:
+	puld
+	pulx
 	rts
 
+check_rcol:
+	pshx
+	psha
+	pshb
+* first, check if the rotation cut off the block.
+* to do that, we move it left and compare it with
+* vanilla. If it's the same, we're good and move on 
+* to stage collision check.
+	ldaa	shift_offset
+check_rcol_1:
+	cmpa	#0
+	beq	check_rcol_2
+	jsr	move_left
+	deca
+	bra     check_rcol_1
+check_rcol_2:
+	ldx	block_ptr
+	ldy     block_ptr
+	leay	48,y
+	ldaa	block_height
+check_rcol_3
+	ldab	0,x
+	eorb	0,y
+	bne	check_rcol_4
+	dex
+	dey
+	deca
+	beq	check_rcol_5
+	bra	check_rcol_3
+check_rcol_4:
+	jsr	set_collision
+	bra	check_rcol_e
+
+* at this point we know the block isn't cut off, so
+* check the stage
+check_rcol_5:
+	ldaa	shift_offset
+check_rcol_6:
+	cmpa	#0
+	beq	check_rcol_7
+	jsr	move_right
+	deca
+	bra     check_rcol_6
+check_rcol_7:
+	ldab	block_height
+	ldx	block_ptr
+	ldy	stage_block_ptr
+	leay	stage_beg,y
+check_rcol_8:
+	ldaa	0,x
+	anda	0,y
+	bne	check_rcol_9
+	dex
+	dey
+	decb
+	beq	check_rcol_e
+	bra	check_rcol_8
+check_rcol_9:
+	jsr	set_collision
+check_rcol_e:
+	pulb
+	pula
+	pulx
+	rts
 
 * check for horizontal collision left
 check_hcol_l:
@@ -1006,6 +1137,19 @@ BLK_longL	fcb	$80,$80,$80,$80
 BLK_longD	fcb	$F0,0,0,0
 BLK_longR	fcb	$80,$80,$80,$80
 
+* vanilla blocks. we never touch those.
+BLK_van_squareU	fcb	$C0,$C0,0,0
+BLK_van_squareL	fcb	$C0,$C0,0,0
+BLK_van_squareD	fcb	$C0,$C0,0,0
+BLK_van_squareR	fcb	$C0,$C0,0,0
+BLK_van_teeU	fcb	$40,$E0,0,0
+BLK_van_teeL	fcb	$40,$C0,$40,0
+BLK_van_teeD	fcb	$E0,$40,0,0
+BLK_van_teeR	fcb	$80,$C0,$80,0
+BLK_van_longU	fcb	$F0,0,0,0
+BLK_van_longL	fcb	$80,$80,$80,$80
+BLK_van_longD	fcb	$F0,0,0,0
+BLK_van_longR	fcb	$80,$80,$80,$80
 	
 * ================== */
 * = LCD CHAR TABLE = */
