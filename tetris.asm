@@ -394,7 +394,7 @@ move_down:	ldx	block_ptr
 * else increment stage block pointer
 ;	beq	move_down_1
 	ldaa	stage_block_ptr
-	inca
+;	inca
 	staa	stage_block_ptr
 	bra	move_down_end
 move_down_1
@@ -762,7 +762,8 @@ ScoreKeeper1:	ldaa	#$00	;Clear line loop
 	rts
 
 DrawScore:	pshx
-	ldx	0,y	;ldx with top memory address of CG number
+	ldx	d,y	;ldx with top memory address of CG number
+	pshd
 	ldaa	#Mwrite
 	jsr	LCD_Command
 	ldy	#8
@@ -770,6 +771,7 @@ DrawScore1:	ldaa	1,x+
 	jsr	LCD_Data
 	dey
 	bne	DrawScore1
+	puld
 	pulx
 	rts
 	
@@ -837,7 +839,7 @@ ClearShape:	pshd
 ClearShape1:    ldaa	#Mwrite
 	jsr	LCD_Command
 	ldaa	#$00
-	ldx	#78
+	ldx	#$7F
 ClearShape2:	jsr	LCD_Data
 	dex
 	bne	ClearShape2
@@ -861,25 +863,26 @@ DrawStage:	pshx
 	pshy
 	pshd
 	ldd	#CursorInit	;Load Starting Cursor Point on LCD for stage
+	addd	#$1000
 	std	CSPointer	;Set CSPointer to top of stage
 	xgdx	
 	dex
-	xgdx
-	addd	#$1000	;Move cursor up one and move into stage memory area on LCD
+	xgdx	;Move cursor up one and move into stage memory area on LCD
 	jsr	UpdateCursor	
 	ldaa	#Mwrite	;Draw divide line between score board and stage
 	jsr	LCD_Command
-	ldaa	#%1000111
-	ldx	#$78
+	ldaa	#%10111101
+	ldx	#$7F
 DrawStage1:	jsr	LCD_Data
 	dex
 	bne	DrawStage1	
 	
 	ldx	stage_beg
+	dex
 DrawStage2:	ldd	CSPointer	;Update LCD Cursor for drawing blocks on stage
 	jsr	UpdateCursor
 	ldy	#8
-	ldaa	
+	ldaa	1,+x
 DrawStage3:	lsra
 	bcs	DrawStage4	;Draw Each block on stage
 	jsr	Blank
@@ -893,7 +896,6 @@ DrawStage5:	dey
 	inx
 	xgdx
 	std	CSPointer
-	dex
 	cpx	stage_end
 	bne	DrawStage2
 	puld
@@ -1097,15 +1099,24 @@ LCD_Data:
 
 * this ISR moves the block down one space periodically
 ISR_Timer1:
-	psha		
-; 	jsr	move_down
+	pshd
+	pshx
+	pshy
+	pshc			
+ 	jsr	move_down	;******************Currently does not inc stage_block_ptr
 	ldaa	TFLG1
 	anda	#$02	;Reset Flag
 	staa	TFLG1
-	pula
+	pulc
+	puly
+	pulx
+	puld
 	rti
 	
 ISR_Timer2:	pshd
+	pshx
+	pshy
+	pshc
 	jsr	DrawShape
 	ldd	TCNT
 	addd	#$0FFF
@@ -1113,6 +1124,9 @@ ISR_Timer2:	pshd
 	ldaa	TFLG1
 	anda	#$04
 	staa	TFLG1
+	pulc
+	puly
+	pulx
 	puld
 	rti
 
