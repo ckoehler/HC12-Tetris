@@ -392,12 +392,15 @@ move_down:	ldx	block_ptr
 ;	cmpa	#$FF
 * if we have a collision, merge block into the stage.
 * else increment stage block pointer
-;	beq	move_down_1
+;	beq	move_down_2
 	ldaa	stage_block_ptr
 ;	inca
-	staa	stage_block_ptr
+	cmpa	#16
+	bls	move_down_1
+	ldaa	#4
+move_down_1:	staa	stage_block_ptr
 	bra	move_down_end
-move_down_1
+move_down_2:
 	jsr	merge_blk2stg
 	jsr	determine_block
 	jsr	serve_block
