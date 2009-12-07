@@ -1185,11 +1185,11 @@ BLK_van_longR	fcb	$80,$80,$80,$80
 
 Zero:	fcb	$00
 	fcb	$00
-	fcb	$7C
-	fcb	$A2
-	fcb	$92
-	fcb	$2A
-	fcb	$7C
+	fcb	$7C	;01111100
+	fcb	$A2	;10100010
+	fcb	$92	;10010010
+	fcb	$8A	;10001010
+	fcb	$7C	;01111100
 	fcb	$00
 	
 One:	fcb	$00
