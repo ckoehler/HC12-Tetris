@@ -388,18 +388,13 @@ rotate_right:
 	rts
 
 move_down:	ldx	block_ptr	
-;	jsr	check_vcol
-;	ldaa	collision
-;	cmpa	#$FF
+	jsr	check_vcol
+	ldaa	collision
+	cmpa	#$FF
 * if we have a collision, merge block into the stage.
 * else increment stage block pointer
-;	beq	move_down_2
-	ldd	stage_block_ptr
-	incb
-;	cmpa	#16
-;	bls	move_down_1
-;	ldaa	#4
-move_down_1:	std	stage_block_ptr
+	beq	move_down_2
+	inc	stage_block_ptr
 	bra	move_down_end
 move_down_2:
 	jsr	merge_blk2stg
@@ -699,31 +694,31 @@ check_hcol_rend:
 check_vcol:
 	psha
 	pshb
+	pshx
+	pshy
 	ldab	block_height
-* x will keep track of the stage line
-	ldx	stage_block_ptr
-* y will keep track of the block line
+* x will keep track of the block line
+	ldx	block_ptr
+* y will keep track of the stage line
 	ldy	stage_block_ptr
 check_vcol1:
 * look ahead one row
-	ldaa	1,x
+	ldaa	1,y
 * and it with the current line of the block
-	anda	0,y
+	anda	0,x
 * if we don't get 0, we have a collision
-	jsr	set_collision
-* see if we checked all lines of the block
-	cmpb	#0
-* if so, finish
-	beq	check_vcol_end
-* else decrement b...
+	bne	check_vcol_col
+	dex
+	dey
 	decb
-* ... and check the next line of the stage against the 
-* next line of the block -> increment both x and y
-	inx
-	iny
+	bne	check_vcol1
+	bra	check_vcol_end
+check_vcol_col:
+	jsr	set_collision
 	
-	bra	check_vcol1
 check_vcol_end:	
+	puly
+	pulx
 	pulb
 	pula
 	rts	
