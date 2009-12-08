@@ -828,6 +828,7 @@ DrawShape:	pshd
 	ldd	#CursorInit
 	addd	stage_block_ptr
 	std	CCPointer	;Sets Cursor to correct location
+	adda	#$05
 	std	CPointer
 	
 	ldx	block_ptr	;pointer to memory
@@ -898,9 +899,9 @@ DrawStage:	pshx
 	ldd	#CursorInit	;Load Starting Cursor Point on LCD for stage
 	addd	#$1000
 	std	CSPointer	;Set CSPointer to top of stage
-	xgdx	
-	dex
-	xgdx	;Move cursor up one and move into stage memory area on LCD
+;	xgdx	
+;	dex
+;	xgdx	;Move cursor up one and move into stage memory area on LCD
 	jsr	UpdateCursor	
 	ldaa	#Mwrite	;Draw divide line between score board and stage
 	jsr	LCD_Command
@@ -911,13 +912,12 @@ DrawStage1:	jsr	LCD_Data
 	bne	DrawStage1	
 	
 	ldx	#stage_beg
-	dex
 DrawStage2:	ldd	CSPointer	;Update LCD Cursor for drawing blocks on stage
 	jsr	UpdateCursor
-	ldaa    #Mwrite
-	jsr     LCD_Command
+	ldaa    	#Mwrite
+	jsr    	LCD_Command
 	ldy	#8
-	ldaa	1,+x
+	ldaa	1,x+
 DrawStage3:	lsra
 	bcs	DrawStage4	;Draw Each block on stage
 	jsr	Blank
