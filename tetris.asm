@@ -404,6 +404,7 @@ move_down:	ldx	block_ptr
 	bra	move_down_end
 move_down_2:
 	jsr	merge_blk2stg
+	jsr     	DrawStage
 ;	jsr	clear_full_rows
 	jsr	determine_block
 	jsr	serve_block
@@ -715,6 +716,7 @@ check_vcol:
 	ldx	block_ptr
 * y will keep track of the stage line
 	ldy	stage_block_ptr
+	leay    stage_beg,y
 check_vcol1:
 * look ahead one row
 	ldaa	1,y
