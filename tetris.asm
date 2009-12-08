@@ -168,7 +168,18 @@ InitStage:
 * ========
 Main:
 	jsr	get_buttons
-	
+
+* check for down button
+	ldaa	buttons1
+	anda	#$60
+	beq	Main0
+Main0_1:
+	jsr	move_down
+	ldaa	collision
+	bne	Main4
+	bra	Main0_1
+
+Main0:	
 * check for left button
 	ldaa	buttons1
 	anda	#$80
