@@ -35,6 +35,8 @@ CursorInit	equ	$0005	;Initial Condition for LCD stage
 
 Mwrite	equ	$42	;Memory write command for LCD
 
+all_block_hght	equ	48
+
 * =============
 * = Variables =
 * =============
@@ -79,7 +81,6 @@ temp	rmb	2
 shift_offset	rmb	1
 rot_offset	rmb	1
 cur_block_id	rmb	1
-
 
 * save state information here
 sav_block_ptr	rmb	2
@@ -188,7 +189,7 @@ Main0:
 	ldaa	collision
 	bne	Main4
 	jsr	move_left
-	dec     shift_offset
+	dec     	shift_offset
 	bra	Main4
 Main1:
 * check for right button
@@ -232,7 +233,6 @@ Main3_1:
 	jsr	revert_state
 Main4:
 * reset collision byte. It's a new dawn!
-	cli
 	clr 	collision
 	bra	Main
 
@@ -409,9 +409,9 @@ move_down:	ldx	block_ptr
 * if we have a collision, merge block into the stage.
 * else increment stage block pointer
 	beq	move_down_2
-	ldd     stage_block_ptr
+	ldd     	stage_block_ptr
 	incb
-	std     stage_block_ptr
+	std     	stage_block_ptr
 	bra	move_down_end
 move_down_2:
 	jsr	merge_blk2stg
@@ -454,6 +454,7 @@ merge_blk2stg_1:
 
 
 determine_block:
+	jsr	rst_van_blks
 	ldaa	#128
 	staa	rot_offset
 	ldd	TCNT
@@ -517,6 +518,20 @@ serve_block_4:
 
 
 
+rst_van_blks:
+	ldx	#BLK_squareU
+	ldy	#BLK_van_squareU
+	ldab	all_block_hght
+rst_van_blks_1:
+	ldaa	0,y
+	staa	0,x
+	inx
+	iny
+	decb
+	bne	rst_van_blks_1
+	rts
+
+
 save_state:
 	pshx
 	psha
@@ -533,25 +548,25 @@ save_state:
 revert_state:
 	pshx
 	pshd
-	ldab    block_height
-	ldx     block_ptr
-	leax	48,x
-	ldy     block_ptr
+	ldab    	block_height
+	ldx     	block_ptr
+	leax	#all_block_hght,x
+	ldy     	block_ptr
 revert_state_11
-	ldaa    0,x
-	staa    0,y
+	ldaa    	0,x
+	staa    	0,y
 	dex
 	dey
 	decb
-	bne     revert_state_11
+	bne     	revert_state_11
 	
-	ldx     sav_block_ptr
+	ldx     	sav_block_ptr
 	stx	block_ptr
 	ldaa	sav_shft_offset
 	staa	shift_offset
 	ldaa	sav_rot_offset
 	staa	rot_offset
-	ldaa    shift_offset
+	ldaa    	shift_offset
 revert_state_1:
 	cmpa	#0
 	beq	revert_state_2
@@ -578,24 +593,21 @@ check_rcol_1:
 	beq	check_rcol_2
 	jsr	move_left
 	deca
-	bra     check_rcol_1
+	bra     	check_rcol_1
 check_rcol_2:
 	ldx	block_ptr
-	ldy     block_ptr
-	leay	48,y
+	ldy     	block_ptr
+	leay	#all_block_hght,y
 	ldaa	block_height
 check_rcol_3
 	ldab	0,x
 	eorb	0,y
-	bne	check_rcol_4
+	bne	check_rcol_col
 	dex
 	dey
 	deca
 	beq	check_rcol_5
 	bra	check_rcol_3
-check_rcol_4:
-	jsr	set_collision
-	bra	check_rcol_e
 
 * at this point we know the block isn't cut off, so
 * check the stage
@@ -606,7 +618,7 @@ check_rcol_6:
 	beq	check_rcol_7
 	jsr	move_right
 	deca
-	bra     check_rcol_6
+	bra     	check_rcol_6
 check_rcol_7:
 	ldab	block_height
 	ldx	block_ptr
@@ -615,13 +627,13 @@ check_rcol_7:
 check_rcol_8:
 	ldaa	0,x
 	anda	0,y
-	bne	check_rcol_9
+	bne	check_rcol_col
 	dex
 	dey
 	decb
 	beq	check_rcol_e
 	bra	check_rcol_8
-check_rcol_9:
+check_rcol_col:
 	jsr	set_collision
 check_rcol_e:
 	pulb
@@ -726,7 +738,7 @@ check_vcol:
 	ldx	block_ptr
 * y will keep track of the stage line
 	ldy	stage_block_ptr
-	leay    stage_beg,y
+	leay    	stage_beg,y
 check_vcol1:
 * look ahead one row
 	ldaa	1,y
