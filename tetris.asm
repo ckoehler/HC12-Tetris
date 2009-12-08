@@ -416,7 +416,6 @@ move_down_end:
 
 clear_full_rows:
 	pshx
-	leay	-1,stage_end
 	
 	pulx
 	rts
@@ -427,7 +426,7 @@ merge_blk2stg:
 	pshd
 	ldab	block_height
 	ldy	stage_block_ptr
-	leax	stage_beg, y
+	leax	stage_beg,Y
 	ldy	block_ptr
 merge_blk2stg_1:
 	ldaa	0,x
@@ -450,7 +449,7 @@ determine_block:
 	ldx	#3
 	idiv
 * now we have a number from 0-2 in D/B
-	ldab    #01
+;	ldab    #01
 	stab	cur_block_id
 	ldd	#$4
 	std	stage_block_ptr
@@ -911,10 +910,12 @@ DrawStage1:	jsr	LCD_Data
 	dex
 	bne	DrawStage1	
 	
-	ldx	stage_beg
+	ldx	#stage_beg
 	dex
 DrawStage2:	ldd	CSPointer	;Update LCD Cursor for drawing blocks on stage
 	jsr	UpdateCursor
+	ldaa    #Mwrite
+	jsr     LCD_Command
 	ldy	#8
 	ldaa	1,+x
 DrawStage3:	lsra
