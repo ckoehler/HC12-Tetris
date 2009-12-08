@@ -86,7 +86,7 @@ sav_block_ptr	rmb	2
 sav_shft_offset	rmb	1
 sav_rot_offset	rmb	1
 
-Time            rmb     1
+Time            	rmb     	1
 
 	org	$1000
 * ========
@@ -157,6 +157,8 @@ InitTimer:
 	rts
 	
 InitStage:
+	jsr	DrawStage
+	jsr	ScoreKeeper
 	jsr	determine_block
 	jsr 	serve_block
 	rts
