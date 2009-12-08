@@ -402,6 +402,7 @@ move_down_1:	staa	stage_block_ptr
 	bra	move_down_end
 move_down_2:
 	jsr	merge_blk2stg
+	jsr	clear_full_rows
 	jsr	determine_block
 	jsr	serve_block
 move_down_end:	
@@ -409,6 +410,11 @@ move_down_end:
 * ===================
 * = Game Logic subs =
 * ===================
+
+clear_full_rows:
+	pshx
+	pulx
+	rts
 
 merge_blk2stg:	
 	ldab	block_height
