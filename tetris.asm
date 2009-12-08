@@ -398,7 +398,9 @@ move_down:	ldx	block_ptr
 * if we have a collision, merge block into the stage.
 * else increment stage block pointer
 	beq	move_down_2
-	inc	stage_block_ptr
+	ldd     stage_block_ptr
+	incb
+	std     stage_block_ptr
 	bra	move_down_end
 move_down_2:
 	jsr	merge_blk2stg
@@ -766,6 +768,7 @@ ScoreKeeper1:	ldaa	#$00	;Clear line loop
 	ldab	Score
 	addb	#3
 	stab	Score
+	clra
 	
 	ldx	#10
 	idiv
@@ -925,7 +928,7 @@ DrawStage5:	dey
 	inx
 	xgdx
 	std	CSPointer
-	cpx	stage_end
+	cpx	#stage_end
 	bne	DrawStage2
 	puld
 	puly
