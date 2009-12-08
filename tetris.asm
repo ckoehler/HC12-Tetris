@@ -70,7 +70,7 @@ buttons1l	rmb	1
 buttons2l	rmb	1
 
 * offset from top of the stage, downwards
-stage_block_ptr	rmb	1
+stage_block_ptr	rmb 2
 
 * FF if vertical collision detected
 collision	rmb	1
@@ -217,7 +217,8 @@ Main3_1:
 	jsr	revert_state
 Main4:
 * reset collision byte. It's a new dawn!
- 	clr 	collision
+	cli
+	clr 	collision
 	bra	Main
 
 * ========
@@ -393,12 +394,12 @@ move_down:	ldx	block_ptr
 * if we have a collision, merge block into the stage.
 * else increment stage block pointer
 ;	beq	move_down_2
-	ldaa	stage_block_ptr
-;	inca
-	cmpa	#16
-	bls	move_down_1
-	ldaa	#4
-move_down_1:	staa	stage_block_ptr
+	ldd	stage_block_ptr
+	incb
+;	cmpa	#16
+;	bls	move_down_1
+;	ldaa	#4
+move_down_1:	std	stage_block_ptr
 	bra	move_down_end
 move_down_2:
 	jsr	merge_blk2stg
@@ -419,8 +420,8 @@ clear_full_rows:
 merge_blk2stg:	
 	ldab	block_height
 merge_blk2stg_1:
-	ldaa	stage_block_ptr
-	ldx	#stage_beg, A
+	ldd	stage_block_ptr
+	ldx	#stage_beg, d
 	ldaa	0,x
 	ldy	block_ptr
 	oraa	0,y
@@ -441,8 +442,8 @@ determine_block:
 * now we have a number from 0-2 in D/B
 	ldab    #01
 	stab	cur_block_id
-	ldaa	#$4
-	staa	stage_block_ptr
+	ldd	#$4
+	std	stage_block_ptr
 	rts
 
 * serve the block with ID given in B
@@ -610,6 +611,9 @@ check_rcol_e:
 
 * check for horizontal collision left
 check_hcol_l:
+	pshx
+	pshy
+	pshd
 	ldab	block_height
 	ldx	block_ptr
 check_hcol_l1:
@@ -624,7 +628,7 @@ check_hcol_l1:
 	bra	check_hcol_l1
 * now that we checked bit 7, check collision
 * with the stage.
-check_hcol_l2:	
+check_hcol_l2:
 	ldab	block_height
 	ldx	block_ptr
 	ldy	stage_block_ptr
@@ -642,11 +646,17 @@ check_hcol_l3:
 check_hcol_lcol:
 	jsr	set_collision
 check_hcol_lend:
+	puld
+	puly
+	pulx
 	rts
 
 
 * check for horizontal collision right
 check_hcol_r:
+	pshx
+	pshy
+	pshd
 	ldab	block_height
 	ldx	block_ptr
 check_hcol_r1:
@@ -661,7 +671,7 @@ check_hcol_r1:
 	bra	check_hcol_r1
 * now that we checked bit 7, check collision
 * with the stage.
-check_hcol_r2:	
+check_hcol_r2:
 	ldab	block_height
 	ldx	block_ptr
 	ldy	stage_block_ptr
@@ -679,6 +689,9 @@ check_hcol_r3:
 check_hcol_rcol:
 	jsr	set_collision
 check_hcol_rend:
+	puld
+	puly
+	pulx
 	rts
 
 
@@ -734,7 +747,7 @@ ScoreKeeper:	pshd
 ;Clears Line	
 	ldaa	#Mwrite
 	jsr	LCD_Command
-	ldx	#$78
+	ldx	#$7F
 ScoreKeeper1:	ldaa	#$00	;Clear line loop
 	jsr	LCD_Data
 	dex
@@ -802,7 +815,7 @@ DrawShape:	pshd
 	pshy
 	jsr	ClearShape	;Clears Old shape
 	ldd	#CursorInit
-	addb	stage_block_ptr
+	addd	stage_block_ptr
 	std	CCPointer	;Sets Cursor to correct location
 	std	CPointer
 	
