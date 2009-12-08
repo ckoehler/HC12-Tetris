@@ -402,7 +402,7 @@ move_down:	ldx	block_ptr
 	bra	move_down_end
 move_down_2:
 	jsr	merge_blk2stg
-	jsr	clear_full_rows
+;	jsr	clear_full_rows
 	jsr	determine_block
 	jsr	serve_block
 move_down_end:	
@@ -413,22 +413,30 @@ move_down_end:
 
 clear_full_rows:
 	pshx
+	leay	-1,stage_end
+	
 	pulx
 	rts
 
-merge_blk2stg:	
+merge_blk2stg:
+	pshx
+	pshy
+	pshd
 	ldab	block_height
-merge_blk2stg_1:
-	ldd	stage_block_ptr
-	ldx	#stage_beg, d
-	ldaa	0,x
+	ldy	stage_block_ptr
+	leax	stage_beg, y
 	ldy	block_ptr
+merge_blk2stg_1:
+	ldaa	0,x
 	oraa	0,y
 	staa	0,x
-	inx
-	iny
+	dex
+	dey
 	decb	
 	bne	merge_blk2stg_1
+	puld
+	puly
+	pulx
 	rts
 
 
