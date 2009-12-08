@@ -682,9 +682,9 @@ check_vcol:
 	pshb
 	ldab	block_height
 * x will keep track of the stage line
-	ldx	#stage_block_ptr
+	ldx	stage_block_ptr
 * y will keep track of the block line
-	ldy	#stage_block_ptr
+	ldy	stage_block_ptr
 check_vcol1:
 * look ahead one row
 	ldaa	1,x
