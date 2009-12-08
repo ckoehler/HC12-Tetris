@@ -49,7 +49,7 @@ CHPointer	rmb	2	;Pointer for header
 Score	rmb	1
 * define memory range to store the stage in.
 * stage = all unmovable pixels
-stage_beg	rmb	15
+stage_beg	rmb	16
 stage_end	rmb	1
 
 * points to the bottom memory location that defines
@@ -137,6 +137,8 @@ Var_Init:	ldaa	#4
 	staa	rot_offset
 	clr     	shift_offset
 	clr	Score
+	ldaa	#$FF
+	staa	stage_end
 	rts
 
 InitTimer:
