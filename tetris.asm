@@ -151,12 +151,11 @@ InitTimer:
 	staa	TIOS
 	ldaa	#$80	;Enable Timer
 	staa	TSCR
-	ldaa	#$06
+	ldaa	#$02
 	staa	TMSK1
 	rts
 	
-InitStage:
-	jsr	DrawStage
+InitStage:	jsr	DrawStageBounds
 	jsr	ScoreBoard
 	jsr	determine_block
 	jsr 	serve_block
@@ -348,6 +347,7 @@ move_left_1:
 	beq	move_left_end
 	bra	move_left_1
 move_left_end:
+	jsr	DrawShape
 	pulb
 	pulx
 	pula
@@ -371,6 +371,7 @@ move_right_1:
 	beq	move_right_end
 	bra	move_right_1
 move_right_end:
+	jsr	DrawShape
 	pulb
 	pulx
 	pula
@@ -384,6 +385,7 @@ rotate_left:
 	inc	rot_offset
 	ldab	cur_block_id
 	jsr	serve_block
+	jsr	DrawShape
 	pulb
 	pulx
 	rts
@@ -396,6 +398,7 @@ rotate_right:
 	dec	rot_offset
 	ldab	cur_block_id
 	jsr 	serve_block
+	jsr	DrawShape
 	pulb
 	pulx
 	rts
@@ -418,6 +421,7 @@ move_down_2:
 	jsr	determine_block
 	jsr	serve_block
 move_down_end:	
+	jsr	DrawShape
 	rts
 * ===================
 * = Game Logic subs =
@@ -771,8 +775,14 @@ set_collision:
 * = Score = *
 * ========= *
 
-Score:	pshb
+Score_Inc:	pshb
 	addb	#3
+	stab	Score
+	pulb
+	rts
+	
+Score_Rst:	pshb
+	ldab	#0
 	stab	Score
 	pulb
 	rts
@@ -780,7 +790,7 @@ Score:	pshb
 ScoreBoard:	pshd
 	pshx
 	pshy
-	ldd	#$2001	;Set cursor to beginning of line
+	ldd	#$1001	;Set cursor to beginning of line
 	std	CHPointer	
 	jsr	UpdateCursor
 ;Clears Line	
@@ -923,10 +933,10 @@ ClearShape2:	jsr	LCD_Data
 DrawStageBounds:	pshx
 	pshy
 	pshd
-	ldy	#CursorInit
 	ldd	#CursorInit	;Load Starting Cursor Point on LCD for stage
-	addd	#$2000
+	addd	#$1000
 	xgdx
+	
 	TFR	x,d
 	jsr	UpdateCursor
 	ldaa	#Mwrite	;Draw divide line between score board and stage
@@ -936,36 +946,45 @@ DrawStageBounds:	pshx
 DrawStageBounds1:	jsr	LCD_Data
 	dey
 	bne	DrawStageBounds1
-	
-DrawStageBounds2:	inx
+
 	TFR	x,d
-	addd	#$0300
-	jsr	UpdateCursor
-	ldaa	#Mwrite
-	jsr	LCD_Command
-	ldaa	#$FF
-	jsr	LCD_Data
-	TFR	x,d
-	addd	#$0900
-	jsr	UpdateCursor
-	ldaa	#Mwrite
-	jsr	LCD_Command
-	ldaa	#$FF
-	jsr	LCD_Data
-	
-	cpx	16,y
-	bne	DrawStageBounds2
-	
-	inx
-	TFR	x,d
+	addd	#17
 	jsr	UpdateCursor
 	ldaa	#Mwrite
 	jsr	LCD_Command
 	ldaa	#%01011101
 	ldy	#$7F
-DrawStageBounds3:	jsr	LCD_Data
+DrawStageBounds2:	jsr	LCD_Data
+	dey
+	bne	DrawStageBounds2
+	
+	ldaa	#$4C	;Curser auto inc AP+1
+	jsr	LCD_Command
+	
+	TFR	x,d
+	addd	#$03C1
+	jsr	UpdateCursor
+	ldaa	#Mwrite
+	jsr	LCD_Command
+	ldy	#16
+DrawStageBounds3:	ldaa	#$FF
+	jsr	LCD_Data
 	dey
 	bne	DrawStageBounds3
+	
+	TFR	x,d
+	addd	#$0C21
+	jsr	UpdateCursor
+	ldaa	#Mwrite
+	jsr	LCD_Command
+	ldy	#16
+DrawStageBounds4:	ldaa	#$FF
+	jsr	LCD_Data
+	dey
+	bne	DrawStageBounds4
+	
+	ldaa	#$4F	;Curser auto inc AP+1
+	jsr	LCD_Command
 	
 	puld
 	puly
@@ -1221,7 +1240,7 @@ ISR_Timer2:	pshd
 	pshx
 	pshy
 	pshc
-	jsr	DrawShape
+;	jsr	DrawShape
 	ldd	TCNT
 	addd	#$0FFF
 	std	TC2
