@@ -172,7 +172,7 @@ Main:
 
 * check for down button
 	ldaa	buttons1
-	anda	#$60
+	anda	#$40
 	beq	Main0
 Main0_1:
 	jsr	move_down
@@ -463,8 +463,10 @@ determine_block:
 * now we have a number from 0-2 in D/B
 ;	ldab    #01
 	stab	cur_block_id
+	pshb
 	ldd	#$4
 	std	stage_block_ptr
+	pulb
 	rts
 
 * serve the block with ID given in B
@@ -521,7 +523,7 @@ serve_block_4:
 rst_van_blks:
 	ldx	#BLK_squareU
 	ldy	#BLK_van_squareU
-	ldab	all_block_hght
+	ldab	#all_block_hght
 rst_van_blks_1:
 	ldaa	0,y
 	staa	0,x
@@ -550,7 +552,7 @@ revert_state:
 	pshd
 	ldab    	block_height
 	ldx     	block_ptr
-	leax	#all_block_hght,x
+	leax	all_block_hght,x
 	ldy     	block_ptr
 revert_state_11
 	ldaa    	0,x
@@ -597,7 +599,7 @@ check_rcol_1:
 check_rcol_2:
 	ldx	block_ptr
 	ldy     	block_ptr
-	leay	#all_block_hght,y
+	leay	all_block_hght,y
 	ldaa	block_height
 check_rcol_3
 	ldab	0,x
@@ -920,12 +922,12 @@ DrawStage:	pshx
 	pshy
 	pshd
 	ldd	#CursorInit	;Load Starting Cursor Point on LCD for stage
-	addd	#$1000
+	addd	#$1001
 	std	CSPointer	;Set CSPointer to top of stage
-;	xgdx	
-;	dex
-;	xgdx	;Move cursor up one and move into stage memory area on LCD
-	jsr	UpdateCursor	
+	xgdx
+	dex
+	xgdx    ;Move cursor up one and move into stage memory area on LCD
+	jsr	UpdateCursor
 	ldaa	#Mwrite	;Draw divide line between score board and stage
 	jsr	LCD_Command
 	ldaa	#%10111101
