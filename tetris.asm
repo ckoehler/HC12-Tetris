@@ -87,8 +87,6 @@ sav_block_ptr	rmb	2
 sav_shft_offset	rmb	1
 sav_rot_offset	rmb	1
 
-Time            	rmb     	1
-
 	org	$1000
 * ========
 * = Init =
@@ -159,7 +157,7 @@ InitTimer:
 	
 InitStage:
 	jsr	DrawStage
-	jsr	ScoreKeeper
+	jsr	ScoreBoard
 	jsr	determine_block
 	jsr 	serve_block
 	rts
@@ -773,7 +771,13 @@ set_collision:
 * = Score = *
 * ========= *
 
-ScoreKeeper:	pshd
+Score:	pshb
+	addb	#3
+	stab	Score
+	pulb
+	rts
+
+ScoreBoard:	pshd
 	pshx
 	pshy
 	ldd	#$2001	;Set cursor to beginning of line
@@ -783,17 +787,15 @@ ScoreKeeper:	pshd
 	ldaa	#Mwrite
 	jsr	LCD_Command
 	ldx	#$7F
-ScoreKeeper1:	ldaa	#$00	;Clear line loop
+ScoreBoard1:	ldaa	#$00	;Clear line loop
 	jsr	LCD_Data
 	dex
-	bne	ScoreKeeper1
+	bne	ScoreBoard1
 
 	ldd	CHPointer	;Set Cursor Back to beginning of line
 	jsr	UpdateCursor
 ;Hex to Decimal	
 	ldab	Score
-	addb	#3
-	stab	Score
 	clra
 	
 	ldx	#10
@@ -853,7 +855,7 @@ DrawShape:	pshd
 	ldd	#CursorInit
 	addd	stage_block_ptr
 	std	CCPointer	;Sets Cursor to correct location
-	adda	#$05
+	adda	#$04
 	std	CPointer
 	
 	ldx	block_ptr	;pointer to memory
@@ -918,23 +920,65 @@ ClearShape2:	jsr	LCD_Data
 	puld
 	rts
 	
-DrawStage:	pshx
+DrawStageBounds:	pshx
 	pshy
 	pshd
+	ldy	#CursorInit
 	ldd	#CursorInit	;Load Starting Cursor Point on LCD for stage
-	addd	#$1001
-	std	CSPointer	;Set CSPointer to top of stage
+	addd	#$2000
 	xgdx
-	dex
-	xgdx    ;Move cursor up one and move into stage memory area on LCD
+	TFR	x,d
 	jsr	UpdateCursor
 	ldaa	#Mwrite	;Draw divide line between score board and stage
 	jsr	LCD_Command
 	ldaa	#%10111101
-	ldx	#$7F
-DrawStage1:	jsr	LCD_Data
-	dex
-	bne	DrawStage1	
+	ldy	#$7F
+DrawStageBounds1:	jsr	LCD_Data
+	dey
+	bne	DrawStageBounds1
+	
+DrawStageBounds2:	inx
+	TFR	x,d
+	addd	#$0300
+	jsr	UpdateCursor
+	ldaa	#Mwrite
+	jsr	LCD_Command
+	ldaa	#$FF
+	jsr	LCD_Data
+	TFR	x,d
+	addd	#$0900
+	jsr	UpdateCursor
+	ldaa	#Mwrite
+	jsr	LCD_Command
+	ldaa	#$FF
+	jsr	LCD_Data
+	
+	cpx	16,y
+	bne	DrawStageBounds2
+	
+	inx
+	TFR	x,d
+	jsr	UpdateCursor
+	ldaa	#Mwrite
+	jsr	LCD_Command
+	ldaa	#%01011101
+	ldy	#$7F
+DrawStageBounds3:	jsr	LCD_Data
+	dey
+	bne	DrawStageBounds3
+	
+	puld
+	puly
+	pulx
+	rts
+	
+DrawStage:	pshx
+	pshy
+	pshd
+	ldd	#CursorInit	;Load Starting Cursor Point on LCD for stage
+	addd	#$1401
+	std	CSPointer	;Set CSPointer to top of stage	
+	
 	
 	ldx	#stage_beg
 DrawStage2:	ldd	CSPointer	;Update LCD Cursor for drawing blocks on stage
