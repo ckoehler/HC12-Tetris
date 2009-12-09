@@ -155,10 +155,12 @@ InitTimer:
 	staa	TMSK1
 	rts
 	
-InitStage:	jsr	DrawStageBounds
-	jsr	ScoreBoard
+InitStage:	
+;	jsr	DrawStageBounds
+;	jsr	ScoreBoard
 	jsr	determine_block
 	jsr 	serve_block
+	jsr	DrawShape
 	rts
 		
 * ========
@@ -421,7 +423,6 @@ move_down_2:
 	jsr	determine_block
 	jsr	serve_block
 move_down_end:	
-	jsr	DrawShape
 	rts
 * ===================
 * = Game Logic subs =
@@ -858,14 +859,15 @@ InitCurPointers:	pshd
 	rts
 
 ;Draws Shape based on values in memory (void)	
-DrawShape:	pshd
+DrawShape:
+	pshd
 	pshx
 	pshy
 	jsr	ClearShape	;Clears Old shape
 	ldd	#CursorInit
 	addd	stage_block_ptr
 	std	CCPointer	;Sets Cursor to correct location
-	adda	#$04
+	addd	#$0400
 	std	CPointer
 	
 	ldx	block_ptr	;pointer to memory
@@ -1227,6 +1229,7 @@ ISR_Timer1:
 	pshy
 	pshc			
  	jsr	move_down	;******************Currently does not inc stage_block_ptr
+	jsr	DrawShape
 	ldaa	TFLG1
 	anda	#$02	;Reset Flag
 	staa	TFLG1
