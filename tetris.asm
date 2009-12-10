@@ -94,6 +94,7 @@ sav_rot_offset	rmb	1
 * ========
 Init:	
 	cli
+	jsr	clear_stage_mem
 	jsr	SPI_INIT
 	jsr	Var_Init
 	jsr	LCD_INIT
@@ -153,6 +154,17 @@ InitStage:
 	jsr	determine_block
 	jsr 	serve_block
 	jsr	DrawShape
+	rts
+	
+clear_stage_mem:
+	ldx	#stage_beg
+	ldab	#16
+clear_stage_mem1:	
+	clr	0,x
+	inx
+	decb
+	bne	clear_stage_mem1
+clear_stage_mem2:
 	rts
 		
 * ========
