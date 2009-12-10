@@ -409,9 +409,14 @@ move_down_end:
 	
 	
 show_gameover:
-	jsr     GameOver
+	sei
+	jsr     	GameOver
 show_gameover1:
-	bra	show_gameover1
+	jsr	get_buttons
+	ldaa	buttons1
+	anda	#$08
+	beq	show_gameover1
+	lbra	Init
 * ===================
 * = Game Logic subs =
 * ===================
