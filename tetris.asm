@@ -508,7 +508,7 @@ determine_block:
 ;	ldab    #01
 	stab	cur_block_id
 	pshb
-	ldd	#$4
+	ldd	#$3
 	std	stage_block_ptr
 	pulb
 	rts
