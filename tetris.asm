@@ -422,7 +422,8 @@ move_down_2:
 ;	jsr	clear_full_rows
 	jsr	determine_block
 	jsr	serve_block
-move_down_end:	
+move_down_end:
+	jsr     DrawShape
 	rts
 * ===================
 * = Game Logic subs =
@@ -460,6 +461,7 @@ determine_block:
 	jsr	rst_van_blks
 	ldaa	#128
 	staa	rot_offset
+	clr     shift_offset
 	ldd	TCNT
 	ldx	#3
 	idiv
