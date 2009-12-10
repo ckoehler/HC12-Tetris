@@ -173,7 +173,7 @@ Main0_1:
 	bra	Main0_1
 Main0_2:
 	cli
-	bra	Main4
+	bra	MainE
 
 Main0:	
 * check for left button
@@ -182,10 +182,10 @@ Main0:
 	beq	Main1
 	jsr	check_hcol_l
 	ldaa	collision
-	bne	Main4
+	bne	MainE
 	jsr	move_left
 	dec     	shift_offset
-	bra	Main4
+	bra	MainE
 Main1:
 * check for right button
 	ldaa	buttons1
@@ -193,10 +193,10 @@ Main1:
 	beq	Main2
 	jsr	check_hcol_r
 	ldaa	collision
-	bne	Main4
+	bne	MainE
 	jsr	move_right
 	inc	shift_offset
-	bra	Main4
+	bra	MainE
 Main2:
 	
 	
@@ -209,24 +209,41 @@ Main2:
 	jsr	check_rcol
 	ldaa	collision
 	bne	Main2_1
-	bra	Main4
+	bra	MainE
 Main2_1:
 	jsr	revert_state
-	bra	Main4
+	bra	MainE
 Main3:
 * check for rotate right (X)
 	ldaa	buttons2
 	anda	#$40
-	beq	Main4
+	beq	MainE
 	jsr	save_state
 	jsr	rotate_right
 	jsr	check_rcol
 	ldaa	collision
 	bne	Main3_1
-	bra	Main4
+	bra	MainE
 Main3_1:
 	jsr	revert_state
+	bra	MainE
+
 Main4:
+* check for Pause (Start button )
+	ldaa	buttons1
+	anda	#$08
+	beq	MainE
+	sei
+Main4_1:
+	jsr	get_buttons
+	ldaa	buttons1
+	anda	#$08
+	beq	Main4_1
+	bra	Main4_2
+	
+Main4_2:	cli
+	bra	MainE
+MainE:
 * reset collision byte. It's a new dawn!
 	clr 	collision
 	bra	Main
