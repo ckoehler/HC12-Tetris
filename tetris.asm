@@ -76,6 +76,7 @@ stage_block_ptr	rmb 2
 
 * FF if vertical collision detected
 collision	rmb	1
+game_over	rmb	1
 
 temp	rmb	2
 shift_offset	rmb	1
@@ -126,6 +127,7 @@ Var_Init:	ldaa	#4
 	clr	Score
 	ldaa	#$FF
 	staa	stage_end
+	clr	game_over
 	rts
 
 * initialize timer subsystem
@@ -377,13 +379,39 @@ move_down_2:
 	jsr	merge_blk2stg
  	jsr	clr_fl_rws
 	jsr     	DrawStage
+	jsr	check_gameover
+	ldaa	game_over
+	beq	move_down_3
+	jsr	show_gameover
+move_down_3
 	jsr	determine_block
 	jsr	serve_block
 move_down_end:
 	rts
+	
+	
+	
+show_gameover:
+
+	bra	show_gameover
 * ===================
 * = Game Logic subs =
 * ===================
+
+
+check_gameover:
+	pshx
+	psha
+	ldx	#stage_beg
+	ldaa	0,x
+	anda	#$00
+	beq	check_gameover_e
+	ldaa	#$FF
+	staa	game_over
+check_gameover_e:
+	pula
+	pulx
+	rts
 
 clr_fl_rws:
 	pshx
