@@ -980,6 +980,7 @@ DrawStageBounds:	pshx
 	pshd
 	ldd	#CursorInit	;Load Starting Cursor Point on LCD for stage
 	addd	#$1000
+	dex
 	xgdx
 	
 	TFR	x,d
@@ -991,7 +992,7 @@ DrawStageBounds:	pshx
 DrawStageBounds1:	jsr	LCD_Data
 	dey
 	bne	DrawStageBounds1
-
+	
 	TFR	x,d
 	addd	#17
 	jsr	UpdateCursor
@@ -1070,6 +1071,42 @@ DrawStage5:	dey
 	puly
 	pulx
 	rts
+
+;GAME OVER
+GameOver:	pshx
+	pshy
+	pshd
+	ldd	#InitCursor
+	addd	#$1008
+	TFR	d,x
+	jsr	UpdateCursor
+	ldy	#$7F
+	ldaa	#Mwrite
+	jsr	LCD_Command
+	
+GameOver1:	ldaa	#$00
+	jsr	LCD_Data
+	dey
+	bne	GameOver1
+	
+	TFR	x,d
+	addd	#$0040
+	jsr	UpdateCursor
+	
+	ldy	#GAME_OVER
+	ldaa	#Mwrite
+	jsr	LCD_Command
+
+GameOver2:	ldaa	1,y+
+	cmpa	#$FF
+	beq	GameOverEND
+	jsr	LCD_Data
+	bra	GameOver2
+GameOverEND:	puld
+	puly
+	pulx
+	rts
+	
 
 ;Requires D have cursor position (D)	
 UpdateCursor:	pshd
@@ -1457,6 +1494,146 @@ Nine:	fcb	$00
 	fcb	$92
 	fcb	$60
 	fcb	$00
+	
+TETRIS:	fcb	$00	;S
+	fcb	$00
+	fcb	$4C
+	fcb	$92
+	fcb	$92
+	fcb	$92
+	fcb	$92
+	fcb	$64
+	fcb	$00
+	
+	fcb	$00	;I
+	fcb	$00
+	fcb	$00
+	fcb	$82
+	fcb	$fe
+	fcb	$82
+	fcb	$00
+	fcb	$00
+	
+	fcb	$00	;R
+	fcb	$00
+	fcb	$62
+	fcb	$94
+	fcb	$98
+	fcb	$90
+	fcb	$fe
+	fcb	$00
+	
+	fcb	$00	;T
+	fcb	$00
+	fcb	$80
+	fcb	$80
+	fcb	$fe
+	fcb	$80
+	fcb	$80
+	fcb	$00
+	
+	fcb	$00	;E
+	fcb	$00
+	fcb	$82
+	fcb	$92
+	fcb	$92
+	fcb	$92
+	fcb	$fe
+	fcb	$00
+	
+	fcb	$00	;T
+	fcb	$00
+	fcb	$80
+	fcb	$80
+	fcb	$fe
+	fcb	$80
+	fcb	$80
+	fcb	$00
+	
+	fcb	$FF
+	
+GAME_OVER:	fcb	$00	;R
+	fcb	$00
+	fcb	$62
+	fcb	$94
+	fcb	$98
+	fcb	$90
+	fcb	$fe
+	fcb	$00
+	
+	fcb	$00	;E
+	fcb	$00
+	fcb	$82
+	fcb	$92
+	fcb	$92
+	fcb	$92
+	fcb	$fe
+	fcb	$00
+	
+	fcb	$00	;V
+	fcb	$00
+	fcb	$f8
+	fcb	$04
+	fcb	$02
+	fcb	$04
+	fcb	$f8
+	fcb	$00
+	
+	fcb	$00	;O
+	fcb	$00
+	fcb	$7C
+	fcb	$82
+	fcb	$82
+	fcb	$82
+	fcb	$7C
+	fcb	$00
+	
+	fcb	$00	;Space
+	fcb	$00
+	fcb	$00
+	fcb	$00
+	fcb	$00
+	fcb	$00
+	fcb	$00
+	fcb	$00
+	
+	fcb	$00	;E
+	fcb	$00
+	fcb	$82
+	fcb	$92
+	fcb	$92
+	fcb	$92
+	fcb	$fe
+	fcb	$00
+	
+	fcb	$00	;M
+	fcb	$00
+	fcb	$FE
+	fcb	$40
+	fcb	$30
+	fcb	$40
+	fcb	$fe
+	fcb	$00
+	
+	fcb	$00	;A
+	fcb	$00
+	fcb	$7e
+	fcb	$88
+	fcb	$88
+	fcb	$88
+	fcb	$7e
+	fcb	$00
+	
+	fcb	$00	;G
+	fcb	$00
+	fcb	$5e
+	fcb	$92
+	fcb	$92
+	fcb	$81
+	fcb	$7c
+	fcb	$00
+	
+	fcb	$FF	;END
 	
 	org	$2500
 NumTbl:	fdb	#Zero,#One,#Two,#Three,#Four,#Five,#Six,#Seven,#Eight,#Nine
