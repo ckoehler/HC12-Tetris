@@ -421,7 +421,7 @@ check_gameover:
 	psha
 	ldx	#stage_beg
 	ldaa	0,x
-	anda	#$00
+	anda	#$FF
 	beq	check_gameover_e
 	ldaa	#$FF
 	staa	game_over
