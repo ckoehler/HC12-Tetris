@@ -95,23 +95,11 @@ Init:
 	cli
 	jsr	SPI_INIT
 	jsr	Var_Init
-
-;LCD Init	
 	jsr	LCD_INIT
 	jsr	InitCurPointers
 	jsr	InitStage
-;************TESTING ONLY**********************	
-;	ldd	#$0005
-;	jsr	UpdateCursor
-;	ldaa	#Mwrite
-;	jsr	LCD_Command
-;	jsr	Square
-
-;***********TESTING ONLY***********************
-
 	jsr	InitTimer
 
-;Jump to Main
 	bra	Main
 
 *Init SPI
@@ -127,7 +115,7 @@ SPI_INIT:
 	orab	#$80
 	stab	PORTS
 	rts
-
+* initialize variables here
 Var_Init:	ldaa	#4
 	clr	buttons1l
 	clr	buttons2l
@@ -140,6 +128,7 @@ Var_Init:	ldaa	#4
 	staa	stage_end
 	rts
 
+* initialize timer subsystem
 InitTimer:
 	ldd	#$FFFF
 	std	TC1
@@ -154,7 +143,8 @@ InitTimer:
 	ldaa	#$02	;TC1 - EN, TC2 - DIS
 	staa	TMSK1
 	rts
-	
+
+* draw up the stage
 InitStage:	
 	jsr	DrawStageBounds
 	jsr	ScoreBoard
