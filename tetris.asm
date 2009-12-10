@@ -151,13 +151,13 @@ InitTimer:
 	staa	TIOS
 	ldaa	#$80	;Enable Timer
 	staa	TSCR
-	ldaa	#$02
+	ldaa	#$02	;TC1 - EN, TC2 - DIS
 	staa	TMSK1
 	rts
 	
 InitStage:	
-;	jsr	DrawStageBounds
-;	jsr	ScoreBoard
+	jsr	DrawStageBounds
+	jsr	ScoreBoard
 	jsr	determine_block
 	jsr 	serve_block
 	jsr	DrawShape
@@ -859,8 +859,7 @@ InitCurPointers:	pshd
 	rts
 
 ;Draws Shape based on values in memory (void)	
-DrawShape:
-	pshd
+DrawShape:	pshd
 	pshx
 	pshy
 	jsr	ClearShape	;Clears Old shape
