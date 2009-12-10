@@ -409,8 +409,9 @@ move_down_end:
 	
 	
 show_gameover:
-
-	bra	show_gameover
+	jsr     GameOver
+show_gameover1:
+	bra	show_gameover1
 * ===================
 * = Game Logic subs =
 * ===================
@@ -908,6 +909,7 @@ DrawShape:	pshd
 	pshy
 	jsr	ClearShape	;Clears Old shape
 	ldd	#CursorInit
+	addd    #1
 	addd	stage_block_ptr
 	std	CCPointer	;Sets Cursor to correct location
 	addd	#$0400
@@ -1077,7 +1079,7 @@ GameOver:	pshx
 	pshy
 	pshd
 	ldd	#InitCursor
-	addd	#$1008
+	addd	#$100C
 	TFR	d,x
 	jsr	UpdateCursor
 	ldy	#$7F
@@ -1090,7 +1092,7 @@ GameOver1:	ldaa	#$00
 	bne	GameOver1
 	
 	TFR	x,d
-	addd	#$0040
+	addd	#$0360
 	jsr	UpdateCursor
 	
 	ldy	#GAME_OVER
