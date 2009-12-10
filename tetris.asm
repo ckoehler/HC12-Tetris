@@ -140,7 +140,7 @@ InitTimer:
 	staa	TIOS
 	ldaa	#$80	;Enable Timer
 	staa	TSCR
-	ldaa	#$02	;TC1 - EN, TC2 - DIS
+	ldaa	#$06	;TC1 - EN, TC2 - EN
 	staa	TMSK1
 	rts
 
@@ -312,7 +312,6 @@ move_left_1:
 	beq	move_left_end
 	bra	move_left_1
 move_left_end:
-	jsr	DrawShape
 	pulb
 	pulx
 	pula
@@ -334,7 +333,6 @@ move_right_1:
 	beq	move_right_end
 	bra	move_right_1
 move_right_end:
-	jsr	DrawShape
 	pulb
 	pulx
 	pula
@@ -346,7 +344,6 @@ rotate_left:
 	inc	rot_offset
 	ldab	cur_block_id
 	jsr	serve_block
-	jsr	DrawShape
 	pulb
 	pulx
 	rts
@@ -357,7 +354,6 @@ rotate_right:
 	dec	rot_offset
 	ldab	cur_block_id
 	jsr 	serve_block
-	jsr	DrawShape
 	pulb
 	pulx
 	rts
@@ -375,12 +371,11 @@ move_down:	ldx	block_ptr
 	bra	move_down_end
 move_down_2:
 	jsr	merge_blk2stg
-	jsr     	DrawStage
-	jsr	clr_fl_rws
+ 	jsr	clr_fl_rws
+	jsr     DrawStage
 	jsr	determine_block
 	jsr	serve_block
 move_down_end:
-	jsr     	DrawShape
 	rts
 * ===================
 * = Game Logic subs =
@@ -396,13 +391,17 @@ clr_fl_rws_0:
 * see if the current row is full
 	ldaa	0,x
 	cmpa	#$FF
-* if not, move on, else, do some stugg
+* if not, move on, else, do some stuff
 	bne	clr_fl_rws_1
 * transfer X to Y and work with it for the internal loop
+	pshx
 	pshd
 	xgdx
 	xgdy
 	puld
+	pulx
+* also increase the score
+	jsr     Score_Inc
 clr_fl_rws_01:
 * take the previous row and overwrite the current row with it
 	ldaa	-1,y
@@ -411,11 +410,13 @@ clr_fl_rws_01:
 * if we're at the top of the stage, exit this loop.
 * otherwise, keep moving lines down
 	cpy	#stage_beg
-	bne	clr_fl_rws_01
+	beq     clr_fl_rws_11
+	bra	clr_fl_rws_01
 clr_fl_rws_1:
 * now move up to the next line and start the process over,
 * until we arrive at the beginning of the stage.
 	dex
+clr_fl_rws_11:
 	cpx	#stage_beg
 	beq	clr_fl_rws_end
 	bra	clr_fl_rws_0
@@ -768,15 +769,18 @@ set_collision:
 * ========= *
 
 Score_Inc:	pshb
+	ldab    Score
 	addb	#3
 	stab	Score
 	pulb
+	jsr     ScoreBoard
 	rts
 	
 Score_Rst:	pshb
 	ldab	#0
 	stab	Score
 	pulb
+	jsr     ScoreBoard
 	rts
 
 ScoreBoard:	pshd
@@ -1233,7 +1237,7 @@ ISR_Timer2:	pshd
 	pshx
 	pshy
 	pshc
-;	jsr	DrawShape
+	jsr	DrawShape
 	ldd	TCNT
 	addd	#$0FFF
 	std	TC2
