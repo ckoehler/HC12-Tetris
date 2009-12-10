@@ -35,7 +35,7 @@ CursorInit	equ	$0005	;Initial Condition for LCD stage
 
 Mwrite	equ	$42	;Memory write command for LCD
 
-all_block_hght	equ	64
+all_block_hght	equ	80
 
 * =============
 * = Variables =
