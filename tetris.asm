@@ -419,19 +419,51 @@ move_down:	ldx	block_ptr
 move_down_2:
 	jsr	merge_blk2stg
 	jsr     	DrawStage
-;	jsr	clear_full_rows
+	jsr	clr_fl_rws
 	jsr	determine_block
 	jsr	serve_block
 move_down_end:
-	jsr     DrawShape
+	jsr     	DrawShape
 	rts
 * ===================
 * = Game Logic subs =
 * ===================
 
-clear_full_rows:
+clr_fl_rws:
 	pshx
-	
+	psha
+* start at the end of the stage
+	ldx	#stage_end
+	dex
+clr_fl_rws_0:
+* see if the current row is full
+	ldaa	0,x
+	cmpa	#$FF
+* if not, move on, else, do some stugg
+	bne	clr_fl_rws_1
+* transfer X to Y and work with it for the internal loop
+	pshd
+	xgdx
+	xgdy
+	puld
+clr_fl_rws_01:
+* take the previous row and overwrite the current row with it
+	ldaa	-1,y
+	staa	0,y
+	dey
+* if we're at the top of the stage, exit this loop.
+* otherwise, keep moving lines down
+	cpy	#stage_beg
+	bne	clr_fl_rws_01
+clr_fl_rws_1:
+* now move up to the next line and start the process over,
+* until we arrive at the beginning of the stage.
+	dex
+	cpx	#stage_beg
+	beq	clr_fl_rws_end
+	bra	clr_fl_rws_0
+clr_fl_rws_end:
+	pula
 	pulx
 	rts
 
