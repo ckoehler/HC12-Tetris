@@ -35,7 +35,7 @@ CursorInit	equ	$0005	;Initial Condition for LCD stage
 
 Mwrite	equ	$42	;Memory write command for LCD
 
-all_block_hght	equ	80
+all_block_hght	equ	112
 
 * =============
 * = Variables =
@@ -457,7 +457,7 @@ determine_block:
 	staa	rot_offset
 	clr     	shift_offset
 	ldd	TCNT
-	ldx	#5
+	ldx	#7
 	idiv
 * now we have a number from 0-4 in D/B
 ;	ldab    #01
@@ -1278,6 +1278,14 @@ BLK_ZiU	fcb	$60,$C0,0,0
 BLK_ZiL	fcb	$80,$C0,$40,0
 BLK_ZiD	fcb	$60,$C0,0,0
 BLK_ZiR	fcb	$80,$C0,$40,0
+BLK_LU	fcb	$E0,$80,0,0
+BLK_LL	fcb	$80,$80,$C0,0
+BLK_LD	fcb	$20,$E0,0,0
+BLK_LR	fcb	$C0,$40,$40,0
+BLK_LiU	fcb	$E0,$20,0,0
+BLK_LiL	fcb	$C0,$80,$80,0
+BLK_LiD	fcb	$80,$E0,0,0
+BLK_LiR	fcb	$20,$20,$C0,0
 
 
 * vanilla blocks. we never touch those.
@@ -1301,6 +1309,14 @@ BLK_van_ZiU	fcb	$60,$C0,0,0
 BLK_van_ZiL	fcb	$80,$C0,$40,0
 BLK_van_ZiD	fcb	$60,$C0,0,0
 BLK_van_ZiR	fcb	$80,$C0,$40,0
+BLK_van_LU	fcb	$E0,$80,0,0
+BLK_van_LL	fcb	$80,$80,$C0,0
+BLK_van_LD	fcb	$20,$E0,0,0
+BLK_van_LR	fcb	$C0,$40,$40,0
+BLK_van_LiU	fcb	$E0,$20,0,0
+BLK_van_LiL	fcb	$C0,$80,$80,0
+BLK_van_LiD	fcb	$80,$E0,0,0
+BLK_van_LiR	fcb	$20,$20,$C0,0
 	
 * ================== */
 * = LCD CHAR TABLE = */
