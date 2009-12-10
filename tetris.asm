@@ -256,6 +256,8 @@ Main4_1:
 Main4_2:	cli
 	bra	MainE
 MainE:
+	ldaa	game_over
+	lbne 	show_gameover
 * reset collision byte. It's a new dawn!
 	clr 	collision
 	lbra	Main
@@ -267,6 +269,7 @@ MainE:
 * saves buttons in buttons1 and buttons2
 get_buttons:
 	psha
+	pshb
 	jsr	Pad_En
 	ldab	#$01	* send Hello to pad
 	jsr	Pad_RW
@@ -297,6 +300,7 @@ get_buttons3:
 	stab	buttons2l
 get_buttons4:
 	jsr	Pad_En
+	pulb
 	pula
 	rts
 
@@ -409,9 +413,6 @@ move_down_2:
  	jsr	clr_fl_rws
 	jsr     	DrawStage
 	jsr	check_gameover
-	ldaa	game_over
-	beq	move_down_3
-	jsr	show_gameover
 move_down_3
 	jsr	determine_block
 	jsr	serve_block
@@ -917,6 +918,9 @@ InitCurPointers:	pshd
 	std	CPointer
 	addd    #3
 	std	CCPointer
+        ldd	#$0000
+	std	CSPointer
+	std	CHPointer
 	puld
 	rts
 
