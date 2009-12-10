@@ -35,7 +35,7 @@ CursorInit	equ	$0005	;Initial Condition for LCD stage
 
 Mwrite	equ	$42	;Memory write command for LCD
 
-all_block_hght	equ	48
+all_block_hght	equ	64
 
 * =============
 * = Variables =
@@ -1322,6 +1322,15 @@ BLK_longU	fcb	$F0,0,0,0
 BLK_longL	fcb	$80,$80,$80,$80
 BLK_longD	fcb	$F0,0,0,0
 BLK_longR	fcb	$80,$80,$80,$80
+BLK_ZU	fcb	$C0,$60,0,0
+BLK_ZL	fcb	$40,$C0,$80,0
+BLK_ZD	fcb	$C0,$60,0,0
+BLK_ZR	fcb	$40,$C0,$80,0
+BLK_ZiU	fcb	$60,$C0,0,0
+BLK_ZiL	fcb	$80,$C0,$40,0
+BLK_ZiD	fcb	$60,$C0,0,0
+BLK_ZiR	fcb	$80,$C0,$40,0
+
 
 * vanilla blocks. we never touch those.
 BLK_van_squareU	fcb	$C0,$C0,0,0
@@ -1336,6 +1345,14 @@ BLK_van_longU	fcb	$F0,0,0,0
 BLK_van_longL	fcb	$80,$80,$80,$80
 BLK_van_longD	fcb	$F0,0,0,0
 BLK_van_longR	fcb	$80,$80,$80,$80
+BLK_van_ZU	fcb	$C0,$60,0,0
+BLK_van_ZL	fcb	$40,$C0,$80,0
+BLK_van_ZD	fcb	$C0,$60,0,0
+BLK_van_ZR	fcb	$40,$C0,$80,0
+BLK_van_ZiU	fcb	$60,$C0,0,0
+BLK_van_ZiL	fcb	$80,$C0,$40,0
+BLK_van_ZiD	fcb	$60,$C0,0,0
+BLK_van_ZiR	fcb	$80,$C0,$40,0
 	
 * ================== */
 * = LCD CHAR TABLE = */
