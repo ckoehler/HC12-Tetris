@@ -1083,8 +1083,8 @@ DrawStage5:	dey
 GameOver:	pshx
 	pshy
 	pshd
-	ldd	#InitCursor
-	addd	#$100C
+	ldd	#CursorInit
+	addd	#$1008
 	TFR	d,x
 	jsr	UpdateCursor
 	ldy	#$7F
@@ -1117,8 +1117,7 @@ GameOverEND:	puld
 TetrisTitle:	pshx
 	pshy
 	pshd
-	ldd	#InitCursor
-	addd	#$1C00
+	ldd	#$1C02
 	jsr	UpdateCursor
 
 	ldy	#TETRIS
