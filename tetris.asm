@@ -455,11 +455,11 @@ determine_block:
 	jsr	rst_van_blks
 	ldaa	#128
 	staa	rot_offset
-	clr     shift_offset
+	clr     	shift_offset
 	ldd	TCNT
-	ldx	#3
+	ldx	#5
 	idiv
-* now we have a number from 0-2 in D/B
+* now we have a number from 0-4 in D/B
 ;	ldab    #01
 	stab	cur_block_id
 	pshb
