@@ -863,7 +863,7 @@ ScoreBoard:	pshd
 ;Clears Line	
 	ldaa	#Mwrite
 	jsr	LCD_Command
-	ldx	#$7F
+	ldx	#$20
 ScoreBoard1:	ldaa	#$00	;Clear line loop
 	jsr	LCD_Data
 	dex
@@ -1149,6 +1149,26 @@ TetrisTitle1:	ldaa	1,y+
 	jsr	LCD_Data
 	bra	TetrisTitle1
 TetrisTitleEND:	puld
+	puly
+	pulx
+	rts
+	
+DrawPause:	pshx
+	pshy
+	pshd
+	ldd	#$0000
+	jsr	UpdateCursor
+
+	ldy	#PAUSE
+	ldaa	#Mwrite
+	jsr	LCD_Command
+
+DrawPause1:	ldaa	1,y+
+	cmpa	#$FF
+	beq	DrawPauseEND
+	jsr	LCD_Data
+	bra	DrawPause1
+DrawPauseEND:	puld
 	puly
 	pulx
 	rts
@@ -1596,7 +1616,7 @@ TETRIS:	fcb	$00	;S
 	fcb	$80
 	fcb	$00
 	
-	fcb	$FF
+	fcb	$FF	;END
 	
 GAME_OVER:	fcb	$00	;R
 	fcb	$00
@@ -1675,8 +1695,19 @@ GAME_OVER:	fcb	$00	;R
 	fcb	$5e
 	fcb	$92
 	fcb	$92
-	fcb	$81
+	fcb	$82
 	fcb	$7c
+	fcb	$00
+	
+	fcb	$FF	;END
+	
+PAUSE:	fcb	$00	;P
+	fcb	$00
+	fcb	$60
+	fcb	$90
+	fcb	$90
+	fcb	$90
+	fcb	$FE
 	fcb	$00
 	
 	fcb	$FF	;END
