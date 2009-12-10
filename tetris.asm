@@ -155,6 +155,7 @@ InitStage:
 	jsr	determine_block
 	jsr 	serve_block
 	jsr	DrawShape
+	jsr     TetrisTitle
 	rts
 	
 clear_stage_mem:
@@ -856,7 +857,7 @@ Score_Rst:	pshb
 ScoreBoard:	pshd
 	pshx
 	pshy
-	ldd	#$1001	;Set cursor to beginning of line
+	ldd	#$1002	;Set cursor to beginning of line
 	std	CHPointer	
 	jsr	UpdateCursor
 ;Clears Line	
@@ -1135,7 +1136,7 @@ GameOverEND:	puld
 TetrisTitle:	pshx
 	pshy
 	pshd
-	ldd	#$1C02
+	ldd	#$1802
 	jsr	UpdateCursor
 
 	ldy	#TETRIS
