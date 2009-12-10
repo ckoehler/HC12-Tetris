@@ -163,11 +163,15 @@ Main:
 	ldaa	buttons1
 	anda	#$40
 	beq	Main0
+	sei
 Main0_1:
 	jsr	move_down
 	ldaa	collision
-	bne	Main4
+	bne	Main0_2
 	bra	Main0_1
+Main0_2:
+	cli
+	bra	Main4
 
 Main0:	
 * check for left button
@@ -372,7 +376,7 @@ move_down:	ldx	block_ptr
 move_down_2:
 	jsr	merge_blk2stg
  	jsr	clr_fl_rws
-	jsr     DrawStage
+	jsr     	DrawStage
 	jsr	determine_block
 	jsr	serve_block
 move_down_end:
