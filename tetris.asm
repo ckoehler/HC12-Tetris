@@ -1285,7 +1285,7 @@ BLK_LR	fcb	$C0,$40,$40,0
 BLK_LiU	fcb	$E0,$20,0,0
 BLK_LiL	fcb	$C0,$80,$80,0
 BLK_LiD	fcb	$80,$E0,0,0
-BLK_LiR	fcb	$20,$20,$C0,0
+BLK_LiR	fcb	$40,$40,$C0,0
 
 
 * vanilla blocks. we never touch those.
@@ -1316,7 +1316,7 @@ BLK_van_LR	fcb	$C0,$40,$40,0
 BLK_van_LiU	fcb	$E0,$20,0,0
 BLK_van_LiL	fcb	$C0,$80,$80,0
 BLK_van_LiD	fcb	$80,$E0,0,0
-BLK_van_LiR	fcb	$20,$20,$C0,0
+BLK_van_LiR	fcb	$40,$40,$C0,0
 	
 * ================== */
 * = LCD CHAR TABLE = */
