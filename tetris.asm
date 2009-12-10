@@ -249,11 +249,13 @@ Main4:
 	anda	#$08
 	beq	MainE
 	sei
+	jsr	DrawPause
 Main4_1:
 	jsr	get_buttons
 	ldaa	buttons1
 	anda	#$08
 	beq	Main4_1
+	jsr	ClearPause
 	bra	Main4_2
 	
 Main4_2:	cli
@@ -1171,6 +1173,15 @@ DrawPause1:	ldaa	1,y+
 DrawPauseEND:	puld
 	puly
 	pulx
+	rts
+	
+ClearPause:	pshd
+	ldd	#$0000
+	jsr	UpdateCursor
+	ldaa	#Mwrite
+	jsr	LCD_Command
+	jsr	Blank
+	puld
 	rts
 	
 
