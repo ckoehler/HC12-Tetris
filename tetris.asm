@@ -217,7 +217,7 @@ Main3:
 * check for rotate right (X)
 	ldaa	buttons2
 	anda	#$40
-	beq	MainE
+	beq	Main4
 	jsr	save_state
 	jsr	rotate_right
 	jsr	check_rcol
@@ -246,7 +246,7 @@ Main4_2:	cli
 MainE:
 * reset collision byte. It's a new dawn!
 	clr 	collision
-	bra	Main
+	lbra	Main
 
 * ========
 * = Subs =
