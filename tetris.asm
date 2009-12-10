@@ -217,7 +217,7 @@ Main3:
 * check for rotate right (X)
 	ldaa	buttons2
 	anda	#$40
-	beq	MainE
+	beq	Main4
 	jsr	save_state
 	jsr	rotate_right
 	jsr	check_rcol
@@ -246,7 +246,7 @@ Main4_2:	cli
 MainE:
 * reset collision byte. It's a new dawn!
 	clr 	collision
-	bra	Main
+	lbra	Main
 
 * ========
 * = Subs =
@@ -421,7 +421,7 @@ check_gameover:
 	psha
 	ldx	#stage_beg
 	ldaa	0,x
-	anda	#$00
+	anda	#$FF
 	beq	check_gameover_e
 	ldaa	#$FF
 	staa	game_over
@@ -508,7 +508,7 @@ determine_block:
 ;	ldab    #01
 	stab	cur_block_id
 	pshb
-	ldd	#$4
+	ldd	#$3
 	std	stage_block_ptr
 	pulb
 	rts
