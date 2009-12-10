@@ -1109,6 +1109,27 @@ GameOverEND:	puld
 	pulx
 	rts
 	
+TetrisTitle:	pshx
+	pshy
+	pshd
+	ldd	#InitCursor
+	addd	#$1C00
+	jsr	UpdateCursor
+
+	ldy	#TETRIS
+	ldaa	#Mwrite
+	jsr	LCD_Command
+
+TetrisTitle1:	ldaa	1,y+
+	cmpa	#$FF
+	beq	TetrisTitleEND
+	jsr	LCD_Data
+	bra	TetrisTitle1
+TetrisTitleEND:	puld
+	puly
+	pulx
+	rts
+	
 
 ;Requires D have cursor position (D)	
 UpdateCursor:	pshd
