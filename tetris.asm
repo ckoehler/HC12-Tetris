@@ -301,31 +301,6 @@ Pad_RW1:
 Pad_RW_E:	pula
 	rts
 
-* =======================
-* = SCI utility methods =
-* =======================	
-* work on the byte that X points to that we get
-Output:
-	psha
-Output1:	ldaa	0,x	* get first character of what X points to
-	inx		* increment x to get the next address to read from
-	cmpa	#$00	* did we encounter a 0 char?
-	beq	OutputEnd	* if so, end
-	jsr	Output_Char	* otherwise, print the character, from regA
-	bra	Output1	* and start all over
-OutputEnd:	pula
-	rts
-
-* expects data to send out in A
-Output_Char:     
-	pshb
-Output_Char1:	ldab	SC0SR1	* check to see if the transmit register is empty
-	andb	#$80
-	cmpb	#$80
-	bne	Output_Char1	* if not, keep looping until it is
-	staa	SC0DRL	* finally, write the character to the SCI
-	pulb
-	rts
 	
 * ==================
 * = Button actions =
@@ -336,8 +311,6 @@ move_left:
 	psha
 	pshx
 	pshb
-*        	ldx	#STR_moveleft
-*	jsr	Output
 	ldx	block_ptr
 	ldab	block_height
 move_left_1:
@@ -360,8 +333,6 @@ move_right:
 	psha
 	pshx
 	pshb
-*	ldx	#STR_moveright
-*	jsr	Output
 	ldx	block_ptr
 	ldab	block_height
 move_right_1:
@@ -382,8 +353,6 @@ move_right_end:
 rotate_left:
 	pshx
 	pshb
-*	ldx	#STR_rotateleft
-*	jsr	Output
 	inc	rot_offset
 	ldab	cur_block_id
 	jsr	serve_block
@@ -395,8 +364,6 @@ rotate_left:
 rotate_right:
 	pshx
 	pshb
-*	ldx	#STR_rotateright
-*	jsr	Output
 	dec	rot_offset
 	ldab	cur_block_id
 	jsr 	serve_block
@@ -1289,23 +1256,6 @@ ISR_Timer2:	pshd
 	puld
 	rti
 
-* ====================
-* = Constant strings =
-* ====================
-STR_moveleft:	fcc	"Left pushed!"
-	fcb	10,13,0
-
-STR_moveright:	fcc	"Right pushed!"
-	fcb	10,13,0
-
-STR_rotateright:	fcc	"rotate right!"
-	fcb	10,13,0
-		
-STR_rotateleft:	fcc	"rotate left!"
-	fcb	10,13,0
-
-STR_test:	fcc	"Test!"
-	fcb	10,13,0
 	
 * ==========
 * = Blocks =
