@@ -93,7 +93,7 @@ sav_rot_offset	rmb	1
 * = Init =
 * ========
 Init:	
-	cli
+	sei
 	jsr	clear_stage_mem
 	jsr	SPI_INIT
 	jsr	Var_Init
@@ -101,7 +101,7 @@ Init:
 	jsr	InitCurPointers
 	jsr	InitStage
 	jsr	InitTimer
-
+	cli
 	bra	Main
 
 *Init SPI
@@ -129,6 +129,7 @@ Var_Init:	ldaa	#4
 	ldaa	#$FF
 	staa	stage_end
 	clr	game_over
+	clr     collision
 	rts
 
 * initialize timer subsystem
@@ -184,6 +185,7 @@ Main0_1:
 	bne	Main0_2
 	bra	Main0_1
 Main0_2:
+	clr     collision
 	cli
 	bra	MainE
 
