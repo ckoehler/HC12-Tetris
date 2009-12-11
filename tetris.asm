@@ -48,7 +48,7 @@ CCPointer	rmb	2	;Pointer for clearning current block
 CSPointer	rmb	2	;Pointer for stage
 CHPointer	rmb	2	;Pointer for header
 * Score memory for game
-Score	rmb	1
+Score	rmb	2
 * define memory range to store the stage in.
 * stage = all unmovable pixels
 stage_beg	rmb	16
@@ -72,7 +72,7 @@ buttons1l	rmb	1
 buttons2l	rmb	1
 
 * offset from top of the stage, downwards
-stage_block_ptr	rmb 2
+stage_block_ptr	rmb 	2
 
 * FF if vertical collision detected
 collision	rmb	1
@@ -125,11 +125,12 @@ Var_Init:	ldaa	#4
 	ldaa	#128
 	staa	rot_offset
 	clr     	shift_offset
-	clr	Score
+	ldd	#0
+	std	Score
 	ldaa	#$FF
 	staa	stage_end
 	clr	game_over
-	clr     collision
+	clr     	collision
 	rts
 
 * initialize timer subsystem
@@ -155,7 +156,7 @@ InitStage:
 	jsr	determine_block
 	jsr 	serve_block
 	jsr	DrawShape
-	jsr     TetrisTitle
+	jsr     	TetrisTitle
 	rts
 	
 clear_stage_mem:
@@ -186,7 +187,7 @@ Main0_1:
 	bne	Main0_2
 	bra	Main0_1
 Main0_2:
-	clr     collision
+	clr     	collision
 	cli
 	bra	MainE
 
@@ -474,7 +475,7 @@ clr_fl_rws_0:
 	puld
 	pulx
 * also increase the score
-	jsr     Score_Inc
+	jsr     	Score_Inc
 clr_fl_rws_01:
 * take the previous row and overwrite the current row with it
 	ldaa	-1,y
@@ -483,7 +484,7 @@ clr_fl_rws_01:
 * if we're at the top of the stage, exit this loop.
 * otherwise, keep moving lines down
 	cpy	#stage_beg
-	beq     clr_fl_rws_11
+	beq     	clr_fl_rws_11
 	bra	clr_fl_rws_01
 clr_fl_rws_1:
 * now move up to the next line and start the process over,
@@ -841,19 +842,19 @@ set_collision:
 * = Score = *
 * ========= *
 
-Score_Inc:	pshb
-	ldab    Score
-	addb	#3
-	stab	Score
-	pulb
-	jsr     ScoreBoard
+Score_Inc:	pshd
+	ldd	Score
+	addd	#3
+	std	Score
+	puld
+	jsr     	ScoreBoard
 	rts
 	
-Score_Rst:	pshb
-	ldab	#0
-	stab	Score
-	pulb
-	jsr     ScoreBoard
+Score_Rst:	pshd
+	ldd	#0
+	std	Score
+	puld
+	jsr     	ScoreBoard
 	rts
 
 ScoreBoard:	pshd
@@ -874,8 +875,7 @@ ScoreBoard1:	ldaa	#$00	;Clear line loop
 	ldd	CHPointer	;Set Cursor Back to beginning of line
 	jsr	UpdateCursor
 ;Hex to Decimal	
-	ldab	Score
-	clra
+	ldd	Score
 	
 	ldx	#10
 	idiv
@@ -921,9 +921,9 @@ DrawScore1:	ldaa	1,x+
 InitCurPointers:	pshd
 	ldd	#CursorInit
 	std	CPointer
-	addd    #3
+	addd    	#3
 	std	CCPointer
-        ldd	#$0000
+        	ldd	#$0000
 	std	CSPointer
 	std	CHPointer
 	puld
@@ -935,7 +935,7 @@ DrawShape:	pshd
 	pshy
 	jsr	ClearShape	;Clears Old shape
 	ldd	#CursorInit
-	addd    #1
+	addd    	#1
 	addd	stage_block_ptr
 	std	CCPointer	;Sets Cursor to correct location
 	addd	#$0400
