@@ -124,8 +124,7 @@ Var_Init:	ldaa	#4
 	staa	block_height
 	ldaa	#128
 	staa	rot_offset
-	ldaa	#2
-	staa     	shift_offset
+	clr     	shift_offset
 	clr	Score
 	ldaa	#$FF
 	staa	stage_end
@@ -525,8 +524,7 @@ determine_block:
 	jsr	rst_van_blks
 	ldaa	#128
 	staa	rot_offset
-	ldaa	#2
-	staa     	shift_offset
+	clr     	shift_offset
 	ldd	TCNT
 	ldx	#7
 	idiv
@@ -1419,65 +1417,65 @@ ISR_Timer2:	pshd
 * ==========
 * = Blocks =
 * ==========
-BLK_squareU	fcb	$30,$30,0,0
-BLK_squareL	fcb	$30,$30,0,0
-BLK_squareD	fcb	$30,$30,0,0
-BLK_squareR	fcb	$30,$30,0,0
-BLK_teeU	fcb	$10,$38,0,0
-BLK_teeL	fcb	$10,$30,$10,0
-BLK_teeD	fcb	$38,$10,0,0
-BLK_teeR	fcb	$20,$30,$20,0
-BLK_longU	fcb	$3C,0,0,0
-BLK_longL	fcb	$20,$20,$20,$20
-BLK_longD	fcb	$3C,0,0,0
-BLK_longR	fcb	$20,$20,$20,$20
-BLK_ZU	fcb	$30,$18,0,0
-BLK_ZL	fcb	$10,$30,$20,0
-BLK_ZD	fcb	$30,$18,0,0
-BLK_ZR	fcb	$10,$30,$20,0
-BLK_ZiU	fcb	$18,$30,0,0
-BLK_ZiL	fcb	$08,$30,$10,0
-BLK_ZiD	fcb	$18,$30,0,0
-BLK_ZiR	fcb	$08,$30,$10,0
-BLK_LU	fcb	$38,$08,0,0
-BLK_LL	fcb	$08,$08,$30,0
-BLK_LD	fcb	$08,$38,0,0
-BLK_LR	fcb	$30,$10,$10,0
-BLK_LiU	fcb	$38,$08,0,0
-BLK_LiL	fcb	$30,$08,$08,0
-BLK_LiD	fcb	$08,$38,0,0
-BLK_LiR	fcb	$10,$10,$30,0
+BLK_squareU	fcb	$C0,$C0,0,0
+BLK_squareL	fcb	$C0,$C0,0,0
+BLK_squareD	fcb	$C0,$C0,0,0
+BLK_squareR	fcb	$C0,$C0,0,0
+BLK_teeU	fcb	$40,$E0,0,0
+BLK_teeL	fcb	$40,$C0,$40,0
+BLK_teeD	fcb	$E0,$40,0,0
+BLK_teeR	fcb	$80,$C0,$80,0
+BLK_longU	fcb	$F0,0,0,0
+BLK_longL	fcb	$80,$80,$80,$80
+BLK_longD	fcb	$F0,0,0,0
+BLK_longR	fcb	$80,$80,$80,$80
+BLK_ZU	fcb	$C0,$60,0,0
+BLK_ZL	fcb	$40,$C0,$80,0
+BLK_ZD	fcb	$C0,$60,0,0
+BLK_ZR	fcb	$40,$C0,$80,0
+BLK_ZiU	fcb	$60,$C0,0,0
+BLK_ZiL	fcb	$80,$C0,$40,0
+BLK_ZiD	fcb	$60,$C0,0,0
+BLK_ZiR	fcb	$80,$C0,$40,0
+BLK_LU	fcb	$E0,$80,0,0
+BLK_LL	fcb	$80,$80,$C0,0
+BLK_LD	fcb	$20,$E0,0,0
+BLK_LR	fcb	$C0,$40,$40,0
+BLK_LiU	fcb	$E0,$20,0,0
+BLK_LiL	fcb	$C0,$80,$80,0
+BLK_LiD	fcb	$80,$E0,0,0
+BLK_LiR	fcb	$40,$40,$C0,0
 
 
 * vanilla blocks. we never touch those.
-BLK_van_squareU	fcb	$30,$30,0,0
-BLK_van_squareL	fcb	$30,$30,0,0
-BLK_van_squareD	fcb	$30,$30,0,0
-BLK_van_squareR	fcb	$30,$30,0,0
-BLK_van_teeU	fcb	$10,$38,0,0
-BLK_van_teeL	fcb	$10,$30,$10,0
-BLK_van_teeD	fcb	$38,$10,0,0
-BLK_van_teeR	fcb	$20,$30,$20,0
-BLK_van_longU	fcb	$3C,0,0,0
-BLK_van_longL	fcb	$20,$20,$20,$20
-BLK_van_longD	fcb	$3C,0,0,0
-BLK_van_longR	fcb	$20,$20,$20,$20
-BLK_van_ZU	fcb	$30,$18,0,0
-BLK_van_ZL	fcb	$10,$30,$20,0
-BLK_van_ZD	fcb	$30,$18,0,0
-BLK_van_ZR	fcb	$10,$30,$20,0
-BLK_van_ZiU	fcb	$18,$30,0,0
-BLK_van_ZiL	fcb	$08,$30,$10,0
-BLK_van_ZiD	fcb	$18,$30,0,0
-BLK_van_ZiR	fcb	$08,$30,$10,0
-BLK_van_LU	fcb	$38,$08,0,0
-BLK_van_LL	fcb	$08,$08,$30,0
-BLK_van_LD	fcb	$08,$38,0,0
-BLK_van_LR	fcb	$30,$10,$10,0
-BLK_van_LiU	fcb	$38,$08,0,0
-BLK_van_LiL	fcb	$30,$08,$08,0
-BLK_van_LiD	fcb	$08,$38,0,0
-BLK_van_LiR	fcb	$10,$10,$30,0
+BLK_van_squareU	fcb	$C0,$C0,0,0
+BLK_van_squareL	fcb	$C0,$C0,0,0
+BLK_van_squareD	fcb	$C0,$C0,0,0
+BLK_van_squareR	fcb	$C0,$C0,0,0
+BLK_van_teeU	fcb	$40,$E0,0,0
+BLK_van_teeL	fcb	$40,$C0,$40,0
+BLK_van_teeD	fcb	$E0,$40,0,0
+BLK_van_teeR	fcb	$80,$C0,$80,0
+BLK_van_longU	fcb	$F0,0,0,0
+BLK_van_longL	fcb	$80,$80,$80,$80
+BLK_van_longD	fcb	$F0,0,0,0
+BLK_van_longR	fcb	$80,$80,$80,$80
+BLK_van_ZU	fcb	$C0,$60,0,0
+BLK_van_ZL	fcb	$40,$C0,$80,0
+BLK_van_ZD	fcb	$C0,$60,0,0
+BLK_van_ZR	fcb	$40,$C0,$80,0
+BLK_van_ZiU	fcb	$60,$C0,0,0
+BLK_van_ZiL	fcb	$80,$C0,$40,0
+BLK_van_ZiD	fcb	$60,$C0,0,0
+BLK_van_ZiR	fcb	$80,$C0,$40,0
+BLK_van_LU	fcb	$E0,$80,0,0
+BLK_van_LL	fcb	$80,$80,$C0,0
+BLK_van_LD	fcb	$20,$E0,0,0
+BLK_van_LR	fcb	$C0,$40,$40,0
+BLK_van_LiU	fcb	$E0,$20,0,0
+BLK_van_LiL	fcb	$C0,$80,$80,0
+BLK_van_LiD	fcb	$80,$E0,0,0
+BLK_van_LiR	fcb	$40,$40,$C0,0
 	
 * ================== */
 * = LCD CHAR TABLE = */
