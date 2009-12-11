@@ -461,6 +461,7 @@ clr_fl_rws:
 * start at the end of the stage
 	ldx	#stage_end
 	dex
+	stab	#0
 clr_fl_rws_0:
 * see if the current row is full
 	ldaa	0,x
@@ -476,6 +477,10 @@ clr_fl_rws_0:
 	pulx
 * also increase the score
 	jsr     	Score_Inc
+	incb
+	cmpb	#4
+	bne	clr_fl_rws_01
+	jsr	Score_Inc_Bonus
 clr_fl_rws_01:
 * take the previous row and overwrite the current row with it
 	ldaa	-1,y
@@ -495,6 +500,7 @@ clr_fl_rws_11:
 	beq	clr_fl_rws_end
 	bra	clr_fl_rws_0
 clr_fl_rws_end:
+	clrb
 	pula
 	pulx
 	rts
@@ -849,6 +855,16 @@ Score_Inc:	pshd
 	puld
 	jsr     	ScoreBoard
 	rts
+	
+Score_Inc_Bonus:
+	pshd
+	ldd	Score
+	addd	#10
+	std	Score
+	puld
+	jsr	ScoreBoard
+	rts
+	
 	
 Score_Rst:	pshd
 	ldd	#0
