@@ -6,3 +6,20 @@ Tetris on a Freescale M68HC12 microprocessor
 - 256x128 LCD display hooked up to Ports G (data) and H (control lines)
 
 If anyone is interested, we can get the exact model for the LCD to make sure it works. It was about $20. 
+
+
+Authors:
+========
+David Ibach (Electrical Engineering)
+Christoph Koehler (Computer Engineering)
+
+
+Copyright:
+==========
+(c) 2009 by us, the authors mentioned above.
+
+
+License:
+========
+Knock yourselves out, take it, redistribute it, change it. Just give us some credit.
+And don't sell it.
