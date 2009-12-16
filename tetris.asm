@@ -461,7 +461,7 @@ clr_fl_rws:
 * start at the end of the stage
 	ldx	#stage_end
 	dex
-	stab	#0
+	ldab	#0
 clr_fl_rws_0:
 * see if the current row is full
 	ldaa	0,x
